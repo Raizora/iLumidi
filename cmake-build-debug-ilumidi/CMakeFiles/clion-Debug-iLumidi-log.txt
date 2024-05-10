@@ -1,0 +1,3 @@
+"/Users/jamiebenchia/JUCE Projects/iLumidi/CMakeLists.txt" -DCMAKE_BUILD_TYPE=Debug -G Ninja "/Users/jamiebenchia/JUCE Projects/iLumidi"
+/Users/jamiebenchia/JUCE Projects/iLumidi/CMakeLists.txt: line 1: syntax error near unexpected token `VERSION'
+/Users/jamiebenchia/JUCE Projects/iLumidi/CMakeLists.txt: line 1: `cmake_minimum_required(VERSION 3.28.5)'

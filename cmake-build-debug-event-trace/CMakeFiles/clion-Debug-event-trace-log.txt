@@ -1,0 +1,6 @@
+/opt/homebrew/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/aarch64/ninja --profiling-format=google-trace --profiling-output=CMakeFiles/clion-event-trace.json -G Ninja -S "/Users/jamiebenchia/JUCE Projects/iLumidi" -B "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug-event-trace"
+CMake Error at CMakeLists.txt:1:
+  Parse error.  Expected a newline, got identifier with text "project".
+
+
+-- Configuring incomplete, errors occurred!

@@ -1,0 +1,7 @@
+/Applications/CMake.app/Contents/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/aarch64/ninja -G Ninja -S "/Users/jamiebenchia/JUCE Projects/iLumidi" -B "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
+-- Configuring juceaide
+-- Building juceaide
+-- Exporting juceaide
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug
