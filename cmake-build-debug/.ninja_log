@@ -1,40 +1,52 @@
 # ninja log v5
-2753	16888	1715284425623283101	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o	433368ff2de03500
-2	27	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
-40	63	1715347135052064786	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o	7ad1f298319e5dad
-110	7194	1715284415933519165	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o	127d41441a3173fc
-3213	5683	1715284414429918894	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_data_structures/juce_data_structures.mm.o	4240fbae857d7a8b
-39	69	1715347135058359390	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o	551f3c0dc89e0904
-41	3213	1715284411950615547	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_events/juce_events.mm.o	c3f44048a12cc77b
-40	2752	1715284411504320316	CMakeFiles/iLumidi.dir/Source/Main.cpp.o	87599fd456ec175c
-35	41	0	clean	ad90e366ad70d77b
-19	374	1715347150616392987	build.ninja	93574f9a43c32a52
-40	4913	1715284413645886871	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o	5bd3800da7035bc2
-40	2761	1715284411512152166	CMakeFiles/iLumidi.dir/Source/MainComponent.cpp.o	9d245395879e22d
-99	9435	1715284418166411556	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o	e42ae36ab67b2e3e
-40	6780	1715284415525806267	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core.mm.o	49d9bf7d997d2e11
-16888	17014	1715284425770216624	iLumidi	663cecd04e3cdf0e
-2762	9378	1715284418105833579	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics.mm.o	15b8904dc4385730
-38	2493	1715347137473262346	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o	327542cc32a3196c
-4777	10104	1715284418846910890	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o	80c1a14db872d259
-39	2875	1715347137853860323	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o	357f5ba3d2dfaad7
-27	218	1715347150616392987	build.ninja	93574f9a43c32a52
-1	20	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
-20	23	0	clean	ad90e366ad70d77b
+1696	10220	1715347160955955045	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o	433368ff2de03500
 2	22	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
 38	56	1715347150819619142	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o	3f5e17f7439261e7
-37	57	1715347150821079605	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o	75c969bc165924fe
-36	1696	1715347152453760372	CMakeFiles/iLumidi.dir/Source/Main.cpp.o	87599fd456ec175c
-36	1752	1715347152507763130	CMakeFiles/iLumidi.dir/Source/MainComponent.cpp.o	9d245395879e22d
-37	1958	1715347152711512579	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_events/juce_events.mm.o	c3f44048a12cc77b
-36	2579	1715347153332723832	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o	37e88f26d159fbd3
-37	2705	1715347153455906521	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o	5bd3800da7035bc2
-1958	3048	1715347153806974570	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_data_structures/juce_data_structures.mm.o	4240fbae857d7a8b
-37	3156	1715347153908553231	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o	71e3ecb29a69ec03
-36	3550	1715347154301786499	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core.mm.o	49d9bf7d997d2e11
 57	3838	1715347154587065003	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o	127d41441a3173fc
+1958	3048	1715347153806974570	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_data_structures/juce_data_structures.mm.o	4240fbae857d7a8b
+37	57	1715347150821079605	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o	75c969bc165924fe
+37	1958	1715347152711512579	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_events/juce_events.mm.o	c3f44048a12cc77b
+36	1696	1715347152453760372	CMakeFiles/iLumidi.dir/Source/Main.cpp.o	87599fd456ec175c
+20	23	0	clean	ad90e366ad70d77b
+27	218	1715955227923340710	build.ninja	93574f9a43c32a52
+37	2705	1715347153455906521	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o	5bd3800da7035bc2
+36	1752	1715347152507763130	CMakeFiles/iLumidi.dir/Source/MainComponent.cpp.o	9d245395879e22d
 56	4835	1715347155580570625	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o	e42ae36ab67b2e3e
-1752	4872	1715347155623937348	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics.mm.o	15b8904dc4385730
-2579	5049	1715347155799109496	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o	80c1a14db872d259
-1696	10220	1715347160955955045	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o	433368ff2de03500
+36	3550	1715347154301786499	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core.mm.o	49d9bf7d997d2e11
 10220	10355	1715347161116846314	iLumidi	663cecd04e3cdf0e
+1752	4872	1715347155623937348	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics.mm.o	15b8904dc4385730
+36	2579	1715347153332723832	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o	37e88f26d159fbd3
+2579	5049	1715347155799109496	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o	80c1a14db872d259
+37	3156	1715347153908553231	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o	71e3ecb29a69ec03
+2	27	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
+27	33	0	clean	ad90e366ad70d77b
+2	26	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
+26	29	0	clean	ad90e366ad70d77b
+1	25	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
+39	58	1715955287577721498	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o	3f5e17f7439261e7
+39	62	1715955287582126655	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o	75c969bc165924fe
+38	1615	1715955289128293569	CMakeFiles/iLumidi.dir/Source/MainComponent.cpp.o	9d245395879e22d
+37	1695	1715955289209246898	CMakeFiles/iLumidi.dir/Source/Main.cpp.o	87599fd456ec175c
+38	1925	1715955289437394294	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_events/juce_events.mm.o	c3f44048a12cc77b
+38	2524	1715955290035395744	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o	37e88f26d159fbd3
+38	2781	1715955290290510290	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o	5bd3800da7035bc2
+1925	3110	1715955290623150466	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_data_structures/juce_data_structures.mm.o	4240fbae857d7a8b
+39	3371	1715955290879918592	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o	71e3ecb29a69ec03
+38	3596	1715955291106062866	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core.mm.o	49d9bf7d997d2e11
+63	3878	1715955291384466906	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o	127d41441a3173fc
+58	4947	1715955292448463334	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o	e42ae36ab67b2e3e
+1695	4969	1715955292478333396	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics.mm.o	15b8904dc4385730
+2524	5157	1715955292664656254	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o	80c1a14db872d259
+1615	10214	1715955297705268858	CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o	433368ff2de03500
+10214	10341	1715955297858119286	iLumidi	663cecd04e3cdf0e
+2	26	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
+4	30	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
+45	1033	1715957691122827712	CMakeFiles/iLumidi.dir/Source/Main.cpp.o	87599fd456ec175c
+1033	1168	1715957691258700858	iLumidi	663cecd04e3cdf0e
+2	27	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
+3	48	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
+78	1261	1715965667643714050	CMakeFiles/iLumidi.dir/Source/Main.cpp.o	87599fd456ec175c
+3	47	0	/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/CMakeFiles/cmake.verify_globs	980f5ff446ab8e30
+78	1175	1715968951482335237	CMakeFiles/iLumidi.dir/Source/Main.cpp.o	87599fd456ec175c
+79	1206	1715968951514901132	CMakeFiles/iLumidi.dir/Source/MainComponent.cpp.o	9d245395879e22d
+1206	1337	1715968951646113795	iLumidi	663cecd04e3cdf0e

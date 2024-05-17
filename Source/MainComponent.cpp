@@ -19,12 +19,31 @@ MainComponent::MainComponent()
         // Specify the number of input and output channels that we want to open
         setAudioChannels (2, 2);
     }
+
+    // Initialize MIDI input
+    auto midiInputs = juce::MidiInput::getAvailableDevices();
+    for (const auto& input : midiInputs) // Updated loop variable to be a const reference
+    {
+        std::unique_ptr<juce::MidiInput> device = juce::MidiInput::openDevice(input.identifier, this);
+        if (device != nullptr)
+        {
+            device->start();
+            midiInputsOpened.add(device.release()); // Use release() to avoide ownership issues
+        }
+    }
+
+    // Start a timer to repaint the component regularly
+    //startTimerHz(30); // Repaint at 30 Hz
 }
 
 MainComponent::~MainComponent()
 {
     // This shuts down the audio device and clears the audio source.
     shutdownAudio();
+
+    // Close MIDI inputs
+    for (auto* device : midiInputsOpened)
+        delete device;
 }
 
 //==============================================================================
@@ -37,6 +56,9 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
     // but be careful - it will be called on the audio thread, not the GUI thread.
 
     // For more details, see the help for AudioProcessor::prepareToPlay()
+
+    midiCollector.reset(sampleRate); // Initialize the MIDI collector with the sample rate
+
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
@@ -48,6 +70,13 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
     // Right now we are not producing any data, in which case we need to clear the buffer
     // (to prevent the output of random noise)
     bufferToFill.clearActiveBufferRegion();
+
+    // Create a MidiBuffer and pass it to removeNextBlockOfMessages
+    juce::MidiBuffer midiBuffer; // Highlighted change
+    midiCollector.removeNextBlockOfMessages(midiBuffer, bufferToFill.numSamples); // Highlighted change
+
+    // Add the collected MIDI messages to the keyboard state
+    keyboardState.processNextMidiBuffer(midiBuffer, 0, bufferToFill.numSamples, true); // Highlighted change
 }
 
 void MainComponent::releaseResources()
@@ -72,4 +101,11 @@ void MainComponent::resized()
     // This is called when the MainContentComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.
+}
+
+//==============================================================================
+// MIDI Input Callback implementation
+void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message)
+{
+    midiCollector.addMessageToQueue(message); // Add incoming MIDI messages to the collector
 }

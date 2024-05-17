@@ -2,6 +2,6 @@
 -- Configuring juceaide
 -- Building juceaide
 -- Exporting juceaide
--- Configuring done (0.2s)
+-- Configuring done (8.7s)
 -- Generating done (0.0s)
 -- Build files have been written to: /Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug
