@@ -36,6 +36,14 @@ MainComponent::MainComponent()
         }
     }
 
+    // Set up the fade rate slider
+    fadeRateSlider.setRange(1.0, 10.0, 0.1);
+    fadeRateSlider.setValue(5.0);
+    fadeRateSlider.addListener(this);
+    addAndMakeVisible(fadeRateSlider);
+
+    fadeRate = fadeRateSlider.getValue();
+
     startTimerHz(30); // Start a timer to repaint the component regularly
 }
 
@@ -87,18 +95,20 @@ void MainComponent::paint(juce::Graphics& g)
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 
     g.setColour(juce::Colours::white);
-    for (const auto& message : midiMessages)
+    for (auto& pair : midiMessages) // X
     {
-        if (message.isNoteOn())
+        auto& message = pair.first; // X
+        float& alpha = pair.second; // X
+        if (message.isNoteOn()) // X
         {
-            int noteNumber = message.getNoteNumber();
-            float velocity = message.getVelocity();
+            int noteNumber = message.getNoteNumber(); // X
+            float velocity = message.getVelocity(); // X
 
             float x = (float)(getWidth() * noteNumber / 127.0); // Position based on note number
             float height = getHeight() * velocity / 127.0; // Height based on velocity
 
             // Calculate color based on note number
-            juce::Colour noteColour = juce::Colour::fromHSV(noteNumber / 127.0f, 0.8f, 0.9f, 1.0f);
+            juce::Colour noteColour = juce::Colour::fromHSV(noteNumber / 127.0f, 0.8f, 0.9f, alpha); // X
 
             g.setColour(noteColour);
 
@@ -106,14 +116,22 @@ void MainComponent::paint(juce::Graphics& g)
             juce::Path triangle;
             triangle.addTriangle(x, getHeight() - height, x + 10.0f, getHeight(), x - 10.0f, getHeight());
             g.fillPath(triangle);
+
+            // Reduce alpha for fading effect
+            alpha *= (1.0f - fadeRate / 100.0f); // X
         }
     }
+
+    // Remove faded out messages
+    midiMessages.erase(std::remove_if(midiMessages.begin(), midiMessages.end(),
+        [](const std::pair<juce::MidiMessage, float>& pair) { return pair.second < 0.01f; }), midiMessages.end()); // X
 }
 
 //==============================================================================
 // Method to handle component resizing
 void MainComponent::resized()
 {
+    fadeRateSlider.setBounds(10, 10, getWidth() - 20, 30); // X
 }
 
 //==============================================================================
@@ -130,7 +148,7 @@ void MainComponent::processMidiMessage(const juce::MidiMessage& message)
 {
     if (message.isNoteOn())
     {
-        midiMessages.push_back(message);
+        midiMessages.emplace_back(message, 1.0f); // Store message with initial alpha value of 1.0f // X
 
         // Limit the size of the stored messages to avoid memory issues
         if (midiMessages.size() > 100)
@@ -145,4 +163,14 @@ void MainComponent::processMidiMessage(const juce::MidiMessage& message)
 void MainComponent::timerCallback()
 {
     repaint(); // Repaint the component to refresh the display
+}
+
+//==============================================================================
+// Method to handle slider value changes
+void MainComponent::sliderValueChanged(juce::Slider* slider) // X
+{
+    if (slider == &fadeRateSlider) // X
+    {
+        fadeRate = fadeRateSlider.getValue(); // X
+    }
 }
