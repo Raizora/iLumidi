@@ -76,6 +76,7 @@ public:
 
             setVisible (true);
             toFront(true);  // Line added: Ensure the window is brought to the front
+
         }
 
         void closeButtonPressed() override

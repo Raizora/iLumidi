@@ -93,9 +93,19 @@ void MainComponent::paint(juce::Graphics& g)
         {
             int noteNumber = message.getNoteNumber();
             float velocity = message.getVelocity();
+
             float x = (float)(getWidth() * noteNumber / 127.0); // Position based on note number
             float height = getHeight() * velocity / 127.0; // Height based on velocity
-            g.fillRect(x, getHeight() - height, 10.0f, height); // Draw rectangle
+
+            // Calculate color based on note number
+            juce::Colour noteColour = juce::Colour::fromHSV(noteNumber / 127.0f, 0.8f, 0.9f, 1.0f);
+
+            g.setColour(noteColour);
+
+            // Draw a triangle
+            juce::Path triangle;
+            triangle.addTriangle(x, getHeight() - height, x + 10.0f, getHeight(), x - 10.0f, getHeight());
+            g.fillPath(triangle);
         }
     }
 }
@@ -127,7 +137,7 @@ void MainComponent::processMidiMessage(const juce::MidiMessage& message)
             midiMessages.erase(midiMessages.begin());
     }
     // Ensure repaint is called on the message thread
-    juce::MessageManager::callAsync([this] { repaint(); }); // X
+    juce::MessageManager::callAsync([this] { repaint(); });
 }
 
 //==============================================================================
