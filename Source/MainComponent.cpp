@@ -44,6 +44,13 @@ MainComponent::MainComponent()
 
     fadeRate = fadeRateSlider.getValue();
 
+    // Set up the color picker
+    noteColorSelector.setCurrentColour(juce::Colours::white); // X
+    noteColorSelector.addChangeListener(this); // X
+    addAndMakeVisible(noteColorSelector); // X
+
+    noteColor = noteColorSelector.getCurrentColour(); // X
+
     startTimerHz(30); // Start a timer to repaint the component regularly
 }
 
@@ -95,43 +102,44 @@ void MainComponent::paint(juce::Graphics& g)
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 
     g.setColour(juce::Colours::white);
-    for (auto& pair : midiMessages) // X
+    for (auto& pair : midiMessages)
     {
-        auto& message = pair.first; // X
-        float& alpha = pair.second; // X
-        if (message.isNoteOn()) // X
+        auto& message = pair.first;
+        float& alpha = pair.second;
+        if (message.isNoteOn())
         {
-            int noteNumber = message.getNoteNumber(); // X
-            float velocity = message.getVelocity(); // X
+            int noteNumber = message.getNoteNumber();
+            float velocity = message.getVelocity();
 
             float x = (float)(getWidth() * noteNumber / 127.0); // Position based on note number
             float height = getHeight() * velocity / 127.0; // Height based on velocity
 
-            // Calculate color based on note number
-            juce::Colour noteColour = juce::Colour::fromHSV(noteNumber / 127.0f, 0.8f, 0.9f, alpha); // X
+            // Calculate color based on user selection and note number
+            juce::Colour noteColour = noteColor.withAlpha(alpha); // X
 
             g.setColour(noteColour);
 
             // Draw a triangle
             juce::Path triangle;
-            triangle.addTriangle(x, getHeight() - height, x + 10.0f, getHeight(), x - 10.0f, getHeight());
+            triangle.addTriangle(x, static_cast<float>(getHeight()) - height, x + 10.0f, static_cast<float>(getHeight()), x - 10.0f, static_cast<float>(getHeight()));
             g.fillPath(triangle);
 
             // Reduce alpha for fading effect
-            alpha *= (1.0f - fadeRate / 100.0f); // X
+            alpha *= (1.0f - fadeRate / 100.0f);
         }
     }
 
     // Remove faded out messages
-    midiMessages.erase(std::remove_if(midiMessages.begin(), midiMessages.end(),
-        [](const std::pair<juce::MidiMessage, float>& pair) { return pair.second < 0.01f; }), midiMessages.end()); // X
+    std::erase_if(midiMessages, [](const std::pair<juce::MidiMessage, float>& pair) { return pair.second < 0.01f; });
 }
 
 //==============================================================================
 // Method to handle component resizing
 void MainComponent::resized()
 {
-    fadeRateSlider.setBounds(10, 10, getWidth() - 20, 30); // X
+    fadeRateSlider.setBounds(10, 10, getWidth() - 20, 30);
+    // Adjust position and size as needed
+    noteColorSelector.setBounds(10, 50, getWidth() - 20, 300); // X
 }
 
 //==============================================================================
@@ -148,7 +156,7 @@ void MainComponent::processMidiMessage(const juce::MidiMessage& message)
 {
     if (message.isNoteOn())
     {
-        midiMessages.emplace_back(message, 1.0f); // Store message with initial alpha value of 1.0f // X
+        midiMessages.emplace_back(message, 1.0f); // Store message with initial alpha value of 1.0f
 
         // Limit the size of the stored messages to avoid memory issues
         if (midiMessages.size() > 100)
@@ -167,10 +175,20 @@ void MainComponent::timerCallback()
 
 //==============================================================================
 // Method to handle slider value changes
-void MainComponent::sliderValueChanged(juce::Slider* slider) // X
+void MainComponent::sliderValueChanged(juce::Slider* slider)
 {
-    if (slider == &fadeRateSlider) // X
+    if (slider == &fadeRateSlider)
     {
-        fadeRate = fadeRateSlider.getValue(); // X
+        fadeRate = fadeRateSlider.getValue();
+    }
+}
+
+//==============================================================================
+// Method to handle color picker changes
+void MainComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
+{
+    if (source == &noteColorSelector)
+    {
+        noteColor = noteColorSelector.getCurrentColour();
     }
 }

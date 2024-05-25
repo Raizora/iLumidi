@@ -7,8 +7,7 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent  : public juce::AudioAppComponent, public juce::MidiInputCallback, private juce::Timer,
-public juce::Slider::Listener
+class MainComponent  : public juce::AudioAppComponent, public juce::MidiInputCallback, public juce::Slider::Listener, public juce::ChangeListener, private juce::Timer // X
 {
 public:
     //==============================================================================
@@ -29,6 +28,7 @@ public:
     // MIDI Input Callback
     void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
     void sliderValueChanged(juce::Slider* slider) override; // X
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override; // X
 
 private:
     //==============================================================================
@@ -51,10 +51,19 @@ private:
     void timerCallback() override;
 
     // Slider for fade rate
-    juce::Slider fadeRateSlider;
+    juce::Slider fadeRateSlider; // X
+
+    // Color picker for note color
+    juce::ColourSelector noteColorSelector; // X
+
+    // Method to handle color changes
+    void noteColorChanged(); // X
 
     // Fade rate parameter
     float fadeRate; // X
+
+    // Note color parameter
+    juce::Colour noteColor; // X
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
