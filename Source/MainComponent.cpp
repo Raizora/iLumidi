@@ -17,41 +17,28 @@ MainComponent::MainComponent()
         setAudioChannels(2, 2);
     }
 
-    // Log available MIDI input devices
-    auto midiInputs = juce::MidiInput::getAvailableDevices();
-    DBG("Available MIDI Inputs:");
-    for (const auto& input : midiInputs)
-    {
-        DBG(input.identifier + ": " + input.name);
-    }
-
     // Initialize MIDI input
-    for (const auto& input : midiInputs)
-    {
-        std::unique_ptr<juce::MidiInput> device = juce::MidiInput::openDevice(input.identifier, this);
-        if (device != nullptr)
-        {
-            device->start();
-            midiInputsOpened.add(device.release());
-        }
-    }
+    refreshMidiInputs(); // Initial setup of MIDI inputs
 
     // Set up the fade rate slider
-    fadeRateSlider.setRange(1.0, 10.0, 0.1);
+    fadeRateSlider.setRange(1.0, 20.0, 0.1); // Updated range
     fadeRateSlider.setValue(5.0);
     fadeRateSlider.addListener(this);
-    addAndMakeVisible(fadeRateSlider);
+
+    // Set up the fade toggle button
+    disableFadeToggle.setButtonText("Disable Fade");
+    disableFadeToggle.addListener(this);
 
     fadeRate = fadeRateSlider.getValue();
 
     // Set up the color picker
-    noteColorSelector.setCurrentColour(juce::Colours::white); // X
-    noteColorSelector.addChangeListener(this); // X
-    addAndMakeVisible(noteColorSelector); // X
+    noteColorSelector.setCurrentColour(juce::Colours::white);
+    noteColorSelector.addChangeListener(this);
 
-    noteColor = noteColorSelector.getCurrentColour(); // X
+    noteColor = noteColorSelector.getCurrentColour();
 
     startTimerHz(30); // Start a timer to repaint the component regularly
+    startTimer(5000); // Start a timer to refresh MIDI inputs every 5 seconds
 }
 
 //==============================================================================
@@ -111,11 +98,11 @@ void MainComponent::paint(juce::Graphics& g)
             int noteNumber = message.getNoteNumber();
             float velocity = message.getVelocity();
 
-            float x = (float)(getWidth() * noteNumber / 127.0); // Position based on note number
-            float height = getHeight() * velocity / 127.0; // Height based on velocity
+            float x = static_cast<float>(getWidth()) * noteNumber / 127.0f; // Position based on note number
+            float height = static_cast<float>(getHeight()) * velocity / 127.0f; // Height based on velocity
 
             // Calculate color based on user selection and note number
-            juce::Colour noteColour = noteColor.withAlpha(alpha); // X
+            juce::Colour noteColour = noteColor.withAlpha(alpha);
 
             g.setColour(noteColour);
 
@@ -124,8 +111,11 @@ void MainComponent::paint(juce::Graphics& g)
             triangle.addTriangle(x, static_cast<float>(getHeight()) - height, x + 10.0f, static_cast<float>(getHeight()), x - 10.0f, static_cast<float>(getHeight()));
             g.fillPath(triangle);
 
-            // Reduce alpha for fading effect
-            alpha *= (1.0f - fadeRate / 100.0f);
+            // Reduce alpha for fading effect if fade is enabled
+            if (!disableFadeToggle.getToggleState())
+            {
+                alpha *= (1.0f - fadeRate / 100.0f);
+            }
         }
     }
 
@@ -137,9 +127,7 @@ void MainComponent::paint(juce::Graphics& g)
 // Method to handle component resizing
 void MainComponent::resized()
 {
-    fadeRateSlider.setBounds(10, 10, getWidth() - 20, 30);
-    // Adjust position and size as needed
-    noteColorSelector.setBounds(10, 50, getWidth() - 20, 300); // X
+    // No need to add MIDI devices label and editor here
 }
 
 //==============================================================================
@@ -170,7 +158,48 @@ void MainComponent::processMidiMessage(const juce::MidiMessage& message)
 // Method called periodically by the timer
 void MainComponent::timerCallback()
 {
-    repaint(); // Repaint the component to refresh the display
+    static int counter = 0;
+    counter++;
+
+    if (counter % 6 == 0) // Refresh MIDI inputs every 5 seconds
+    {
+        refreshMidiInputs();
+    }
+
+    repaint();
+}
+
+//==============================================================================
+// Method to refresh the list of available MIDI inputs
+void MainComponent::refreshMidiInputs()
+{
+    auto midiInputs = juce::MidiInput::getAvailableDevices();
+    DBG("Refreshing MIDI Inputs:");
+    midiDevicesList.clear();
+    for (const auto& input : midiInputs)
+    {
+        DBG(input.identifier + ": " + input.name);
+        midiDevicesList.add(input.name);
+    }
+
+    for (auto* device : midiInputsOpened)
+    {
+        if (device != nullptr)
+        {
+            device->stop();
+        }
+    }
+    midiInputsOpened.clear(true);
+
+    for (const auto& input : midiInputs)
+    {
+        std::unique_ptr<juce::MidiInput> device = juce::MidiInput::openDevice(input.identifier, this);
+        if (device != nullptr)
+        {
+            device->start();
+            midiInputsOpened.add(device.release());
+        }
+    }
 }
 
 //==============================================================================
@@ -190,5 +219,87 @@ void MainComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
     if (source == &noteColorSelector)
     {
         noteColor = noteColorSelector.getCurrentColour();
+    }
+}
+
+//==============================================================================
+// Method to handle button click events
+void MainComponent::buttonClicked(juce::Button* button)
+{
+    if (button == &disableFadeToggle)
+    {
+        fadeToggleChanged();
+    }
+}
+
+//==============================================================================
+// Method to show the settings window
+void MainComponent::showSettingsWindow()
+{
+    if (settingsWindow == nullptr)
+    {
+        auto settingsContent = std::make_unique<juce::Component>();
+
+        // Set the background color for the settings content
+        settingsContent->setColour(juce::ResizableWindow::backgroundColourId, getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+
+        // Add MIDI devices list
+        auto midiDevicesLabel = std::make_unique<juce::Label>("MIDI Devices Label", "MIDI Devices:");
+        midiDevicesLabel->setBounds(10, 10, 380, 30);
+        settingsContent->addAndMakeVisible(*midiDevicesLabel);
+
+        midiDevicesEditor = std::make_unique<juce::TextEditor>();
+        midiDevicesEditor->setMultiLine(true);
+        midiDevicesEditor->setReadOnly(true);
+        midiDevicesEditor->setBounds(10, 50, 380, 100);
+        midiDevicesEditor->setColour(juce::TextEditor::backgroundColourId, getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+        midiDevicesEditor->setColour(juce::TextEditor::textColourId, juce::Colours::white);
+        for (const auto& device : midiDevicesList)
+        {
+            midiDevicesEditor->insertTextAtCaret(device + "\n");
+        }
+        settingsContent->addAndMakeVisible(*midiDevicesEditor);
+
+        int yPos = 160;
+
+        // Move existing settings controls to the settings window
+        fadeRateSlider.setBounds(10, yPos, 380, 30);
+        settingsContent->addAndMakeVisible(fadeRateSlider);
+        yPos += 40;
+
+        disableFadeToggle.setBounds(10, yPos, 380, 30);
+        settingsContent->addAndMakeVisible(disableFadeToggle);
+        yPos += 40;
+
+        noteColorSelector.setBounds(10, yPos, 380, 300);
+        settingsContent->addAndMakeVisible(noteColorSelector);
+        yPos += 310; // Adjusting for the height of noteColorSelector
+
+        // Set the size of settingsContent based on its children components
+        int contentHeight = yPos;
+        settingsContent->setSize(400, contentHeight);  // Set size based on the content height
+
+        settingsWindow = std::make_unique<SettingsWindowCloseButtonHandler>("Settings", juce::Colours::lightgrey, juce::DocumentWindow::allButtons, this);
+        settingsWindow->setContentOwned(settingsContent.release(), true);
+        settingsWindow->centreWithSize(400, contentHeight);   // Centre the window with appropriate width and height
+        settingsWindow->setVisible(true);
+    }
+    else
+    {
+        settingsWindow->toFront(true);
+    }
+}
+
+//==============================================================================
+// Method to handle fade toggle changes
+void MainComponent::fadeToggleChanged()
+{
+    if (disableFadeToggle.getToggleState())
+    {
+        fadeRate = 0.0f; // Set fade rate to 0 if toggled on
+    }
+    else
+    {
+        fadeRate = fadeRateSlider.getValue(); // Restore fade rate from slider
     }
 }
