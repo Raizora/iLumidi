@@ -73,6 +73,14 @@ build CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_basics/j
   OBJECT_DIR = CMakeFiles/iLumidi.dir
   OBJECT_FILE_DIR = CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_basics
 
+build CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o: CXX_COMPILER__iLumidi_unscanned_Debug /Users/jamiebenchia/JUCE/modules/juce_core/juce_core_CompilationTime.cpp || cmake_object_order_depends_target_iLumidi
+  DEFINES = -DDEBUG=1 -DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1 -DJUCE_MODULE_AVAILABLE_juce_audio_basics=1 -DJUCE_MODULE_AVAILABLE_juce_audio_devices=1 -DJUCE_MODULE_AVAILABLE_juce_audio_formats=1 -DJUCE_MODULE_AVAILABLE_juce_audio_processors=1 -DJUCE_MODULE_AVAILABLE_juce_audio_utils=1 -DJUCE_MODULE_AVAILABLE_juce_core=1 -DJUCE_MODULE_AVAILABLE_juce_data_structures=1 -DJUCE_MODULE_AVAILABLE_juce_events=1 -DJUCE_MODULE_AVAILABLE_juce_graphics=1 -DJUCE_MODULE_AVAILABLE_juce_gui_basics=1 -DJUCE_MODULE_AVAILABLE_juce_gui_extra=1 -D_DEBUG=1
+  DEP_FILE = CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o.d
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
+  INCLUDES = -I"/Users/jamiebenchia/JUCE Projects/iLumidi/JuceLibraryCode" -I/Users/jamiebenchia/JUCE/modules -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/VST3_SDK -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lv2 -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/serd -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord/src -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sratom -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv/src
+  OBJECT_DIR = CMakeFiles/iLumidi.dir
+  OBJECT_FILE_DIR = CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core
+
 build CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core.mm.o: CXX_COMPILER__iLumidi_unscanned_Debug /Users/jamiebenchia/JUCE/modules/juce_core/juce_core.mm || cmake_object_order_depends_target_iLumidi
   DEFINES = -DDEBUG=1 -DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1 -DJUCE_MODULE_AVAILABLE_juce_audio_basics=1 -DJUCE_MODULE_AVAILABLE_juce_audio_devices=1 -DJUCE_MODULE_AVAILABLE_juce_audio_formats=1 -DJUCE_MODULE_AVAILABLE_juce_audio_processors=1 -DJUCE_MODULE_AVAILABLE_juce_audio_utils=1 -DJUCE_MODULE_AVAILABLE_juce_core=1 -DJUCE_MODULE_AVAILABLE_juce_data_structures=1 -DJUCE_MODULE_AVAILABLE_juce_events=1 -DJUCE_MODULE_AVAILABLE_juce_graphics=1 -DJUCE_MODULE_AVAILABLE_juce_gui_basics=1 -DJUCE_MODULE_AVAILABLE_juce_gui_extra=1 -D_DEBUG=1
   DEP_FILE = CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core.mm.o.d
@@ -145,6 +153,14 @@ build CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_basics/juc
   OBJECT_DIR = CMakeFiles/iLumidi.dir
   OBJECT_FILE_DIR = CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_basics
 
+build CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o: CXX_COMPILER__iLumidi_unscanned_Debug /Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp || cmake_object_order_depends_target_iLumidi
+  DEFINES = -DDEBUG=1 -DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1 -DJUCE_MODULE_AVAILABLE_juce_audio_basics=1 -DJUCE_MODULE_AVAILABLE_juce_audio_devices=1 -DJUCE_MODULE_AVAILABLE_juce_audio_formats=1 -DJUCE_MODULE_AVAILABLE_juce_audio_processors=1 -DJUCE_MODULE_AVAILABLE_juce_audio_utils=1 -DJUCE_MODULE_AVAILABLE_juce_core=1 -DJUCE_MODULE_AVAILABLE_juce_data_structures=1 -DJUCE_MODULE_AVAILABLE_juce_events=1 -DJUCE_MODULE_AVAILABLE_juce_graphics=1 -DJUCE_MODULE_AVAILABLE_juce_gui_basics=1 -DJUCE_MODULE_AVAILABLE_juce_gui_extra=1 -D_DEBUG=1
+  DEP_FILE = CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o.d
+  FLAGS = -g -std=gnu++20 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
+  INCLUDES = -I"/Users/jamiebenchia/JUCE Projects/iLumidi/JuceLibraryCode" -I/Users/jamiebenchia/JUCE/modules -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/VST3_SDK -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lv2 -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/serd -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sord/src -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/sratom -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv -I/Users/jamiebenchia/JUCE/modules/juce_audio_processors/format_types/LV2_SDK/lilv/src
+  OBJECT_DIR = CMakeFiles/iLumidi.dir
+  OBJECT_FILE_DIR = CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics
+
 build CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics.mm.o: CXX_COMPILER__iLumidi_unscanned_Debug /Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics.mm || cmake_object_order_depends_target_iLumidi
   DEFINES = -DDEBUG=1 -DJUCE_GLOBAL_MODULE_SETTINGS_INCLUDED=1 -DJUCE_MODULE_AVAILABLE_juce_audio_basics=1 -DJUCE_MODULE_AVAILABLE_juce_audio_devices=1 -DJUCE_MODULE_AVAILABLE_juce_audio_formats=1 -DJUCE_MODULE_AVAILABLE_juce_audio_processors=1 -DJUCE_MODULE_AVAILABLE_juce_audio_utils=1 -DJUCE_MODULE_AVAILABLE_juce_core=1 -DJUCE_MODULE_AVAILABLE_juce_data_structures=1 -DJUCE_MODULE_AVAILABLE_juce_events=1 -DJUCE_MODULE_AVAILABLE_juce_graphics=1 -DJUCE_MODULE_AVAILABLE_juce_gui_basics=1 -DJUCE_MODULE_AVAILABLE_juce_gui_extra=1 -D_DEBUG=1
   DEP_FILE = CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics.mm.o.d
@@ -177,7 +193,7 @@ build CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_utils/ju
 #############################################
 # Link the executable iLumidi
 
-build iLumidi: CXX_EXECUTABLE_LINKER__iLumidi_Debug CMakeFiles/iLumidi.dir/Source/Main.cpp.o CMakeFiles/iLumidi.dir/Source/MainComponent.cpp.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_events/juce_events.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_data_structures/juce_data_structures.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o
+build iLumidi: CXX_EXECUTABLE_LINKER__iLumidi_Debug CMakeFiles/iLumidi.dir/Source/Main.cpp.o CMakeFiles/iLumidi.dir/Source/MainComponent.cpp.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_basics/juce_audio_basics.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core_CompilationTime.cpp.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_core/juce_core.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_devices/juce_audio_devices.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_events/juce_events.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_formats/juce_audio_formats.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_processors/juce_audio_processors.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_extra/juce_gui_extra.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_gui_basics/juce_gui_basics.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_graphics/juce_graphics.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_data_structures/juce_data_structures.mm.o CMakeFiles/iLumidi.dir/Users/jamiebenchia/JUCE/modules/juce_audio_utils/juce_audio_utils.mm.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
   LINK_LIBRARIES = -framework Accelerate  -framework Foundation  -framework IOKit  -framework Security  -framework QuartzCore  -framework Cocoa  -weak_framework Metal  -weak_framework MetalKit  -framework WebKit  -framework CoreAudio  -framework CoreMIDI  -framework AudioToolbox  -framework CoreAudioKit  -framework DiscRecording
   OBJECT_DIR = CMakeFiles/iLumidi.dir
@@ -191,7 +207,7 @@ build iLumidi: CXX_EXECUTABLE_LINKER__iLumidi_Debug CMakeFiles/iLumidi.dir/Sourc
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug" && /Applications/CMake.app/Contents/bin/cmake-gui -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
+  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug" && /Applications/CMake.app/Contents/bin/ccmake -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -262,7 +278,7 @@ build install/strip: phony CMakeFiles/install/strip.util
 # Utility command for edit_cache
 
 build JUCE/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/JUCE" && /Applications/CMake.app/Contents/bin/cmake-gui -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
+  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/JUCE" && /Applications/CMake.app/Contents/bin/ccmake -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -333,7 +349,7 @@ build JUCE/install/strip: phony JUCE/CMakeFiles/install/strip.util
 # Utility command for edit_cache
 
 build JUCE/modules/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/JUCE/modules" && /Applications/CMake.app/Contents/bin/cmake-gui -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
+  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/JUCE/modules" && /Applications/CMake.app/Contents/bin/ccmake -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -404,7 +420,7 @@ build JUCE/modules/install/strip: phony JUCE/modules/CMakeFiles/install/strip.ut
 # Utility command for edit_cache
 
 build JUCE/extras/Build/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/JUCE/extras/Build" && /Applications/CMake.app/Contents/bin/cmake-gui -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
+  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/JUCE/extras/Build" && /Applications/CMake.app/Contents/bin/ccmake -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -475,7 +491,7 @@ build JUCE/extras/Build/install/strip: phony JUCE/extras/Build/CMakeFiles/instal
 # Utility command for edit_cache
 
 build JUCE/extras/Build/juceaide/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/JUCE/extras/Build/juceaide" && /Applications/CMake.app/Contents/bin/cmake-gui -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
+  COMMAND = cd "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug/JUCE/extras/Build/juceaide" && /Applications/CMake.app/Contents/bin/ccmake -S"/Users/jamiebenchia/JUCE Projects/iLumidi" -B"/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1

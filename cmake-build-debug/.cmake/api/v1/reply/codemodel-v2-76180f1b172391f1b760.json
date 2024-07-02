@@ -1,0 +1,137 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.28"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "JUCE",
+					"childIndexes" : 
+					[
+						2,
+						3
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-JUCE-Debug-839c5203ac2a5bc17f2c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "/Users/jamiebenchia/JUCE"
+				},
+				{
+					"build" : "JUCE/modules",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-JUCE.modules-Debug-f38f68dd8430b09f3cb9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "/Users/jamiebenchia/JUCE/modules"
+				},
+				{
+					"build" : "JUCE/extras/Build",
+					"childIndexes" : 
+					[
+						4
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-JUCE.extras.Build-Debug-b12117ffb49856c73bb4.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "/Users/jamiebenchia/JUCE/extras/Build"
+				},
+				{
+					"build" : "JUCE/extras/Build/juceaide",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-JUCE.extras.Build.juceaide-Debug-53730f3a6d3db0cc2ef8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 1,
+					"source" : "/Users/jamiebenchia/JUCE/extras/Build/juceaide"
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "iLumidi",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4
+					],
+					"name" : "JUCE",
+					"parentIndex" : 0
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "iLumidi::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-iLumidi-Debug-c1b69541be5c310d1586.json",
+					"name" : "iLumidi",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug",
+		"source" : "/Users/jamiebenchia/JUCE Projects/iLumidi"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

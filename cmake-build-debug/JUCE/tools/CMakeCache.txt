@@ -149,16 +149,16 @@ CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 CMAKE_PROJECT_NAME:STATIC=JUCE
 
 //Value Computed by CMake
-CMAKE_PROJECT_VERSION:STATIC=7.0.12
+CMAKE_PROJECT_VERSION:STATIC=8.0.0
 
 //Value Computed by CMake
-CMAKE_PROJECT_VERSION_MAJOR:STATIC=7
+CMAKE_PROJECT_VERSION_MAJOR:STATIC=8
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION_MINOR:STATIC=0
 
 //Value Computed by CMake
-CMAKE_PROJECT_VERSION_PATCH:STATIC=12
+CMAKE_PROJECT_VERSION_PATCH:STATIC=0
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION_TWEAK:STATIC=
@@ -259,6 +259,10 @@ JUCE_MODULES_ONLY:BOOL=OFF
 
 //Value Computed by CMake
 JUCE_SOURCE_DIR:STATIC=/Users/jamiebenchia/JUCE
+
+//Location that overrides the default directory where our FindWebView2
+// script is looking for the *Microsoft.Web.WebView2* directory
+JUCE_WEBVIEW2_PACKAGE_LOCATION:BOOL=OFF
 
 //Path to a library.
 juce_found_AVFoundation:FILEPATH=/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/System/Library/Frameworks/AVFoundation.framework

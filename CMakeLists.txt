@@ -18,6 +18,7 @@ add_executable(iLumidi
         "/Users/jamiebenchia/JUCE Projects/iLumidi/Source/Main.cpp"
         "/Users/jamiebenchia/JUCE Projects/iLumidi/Source/MainComponent.cpp"
         "/Users/jamiebenchia/JUCE Projects/iLumidi/Source/MainComponent.h"
+        Source/CustomLookAndFeel.h
 )
 
 # Link to the required JUCE modules

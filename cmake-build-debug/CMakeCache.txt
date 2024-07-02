@@ -261,14 +261,9 @@ JUCE_SOURCE_DIR:STATIC=/Users/jamiebenchia/JUCE
 // will be installed
 JUCE_TOOL_INSTALL_DIR:STRING=bin/JUCE-7.0.12
 
-//Value Computed by CMake
-Project_BINARY_DIR:STATIC=/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug
-
-//Value Computed by CMake
-Project_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-Project_SOURCE_DIR:STATIC=/Users/jamiebenchia/JUCE Projects/iLumidi
+//Location that overrides the default directory where our FindWebView2
+// script is looking for the *Microsoft.Web.WebView2* directory
+JUCE_WEBVIEW2_PACKAGE_LOCATION:BOOL=OFF
 
 //Value Computed by CMake
 iLumidi_BINARY_DIR:STATIC=/Users/jamiebenchia/JUCE Projects/iLumidi/cmake-build-debug
@@ -380,7 +375,7 @@ CMAKE_C_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_DLLTOOL
 CMAKE_DLLTOOL-ADVANCED:INTERNAL=1
 //Path to cache edit program executable.
-CMAKE_EDIT_COMMAND:INTERNAL=/Applications/CMake.app/Contents/bin/cmake-gui
+CMAKE_EDIT_COMMAND:INTERNAL=/Applications/CMake.app/Contents/bin/ccmake
 //Executable file format
 CMAKE_EXECUTABLE_FORMAT:INTERNAL=MACHO
 //ADVANCED property for variable: CMAKE_EXE_LINKER_FLAGS
