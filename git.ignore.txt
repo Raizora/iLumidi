@@ -49,6 +49,8 @@ Thumbs.db
 ###############
 build/
 cmake-build-*/
+cmake-build-debug/
+cmake-build-debug/JUCE/
 
 # Exclude macOS specific #
 #########################
