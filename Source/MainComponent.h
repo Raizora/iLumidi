@@ -10,10 +10,12 @@ public:
     MainComponent();
     ~MainComponent() override;
 
+    // Audio Block Methods
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
     void releaseResources() override;
 
+    // Painting Methods
     void paint(juce::Graphics& g) override;
     void resized() override;
 
@@ -26,12 +28,19 @@ public:
     void showSettingsWindow();
 
 private:
+
+    class SettingsWindowCloseButtonHandler;
+
     std::unique_ptr<juce::DocumentWindow> settingsWindow;
     std::unique_ptr<juce::TextEditor> midiDevicesEditor;
 
+    // Midi device selection
     void refreshMidiInputs();
-    void refreshSettingsWindow(); // X- Declare the refreshSettingsWindow method
+    void refreshSettingsWindow();
+    void openSelectedMidiInputs();
+    void applyMidiSelections();
 
+    // Midi input handling
     juce::MidiKeyboardState keyboardState;
     juce::MidiMessageCollector midiCollector;
     std::vector<std::pair<juce::MidiMessage, float>> midiMessages;
@@ -40,14 +49,18 @@ private:
     void processMidiMessage(const juce::MidiMessage& message);
     void timerCallback() override;
 
+    // UI
     juce::Slider fadeRateSlider;
     juce::ToggleButton disableFadeToggle;
+    juce::TextButton scanButton;
     juce::ColourSelector noteColorSelector;
     juce::StringArray midiDevicesList;
     juce::Array<juce::String> selectedMidiDevices;
     juce::Array<int> selectedChannels;
     juce::OwnedArray<juce::ToggleButton> midiDeviceToggles;
     juce::OwnedArray<juce::OwnedArray<juce::ToggleButton>> midiChannelToggles;
+    juce::TextButton applyButton;
+
 
     void updateMidiDeviceSelections();
 
@@ -56,24 +69,7 @@ private:
     float fadeRate;
     juce::Colour noteColor;
 
-    class SettingsWindowCloseButtonHandler : public juce::DocumentWindow
-    {
-    public:
-        SettingsWindowCloseButtonHandler(const juce::String& name, juce::Colour backgroundColour, int buttons, MainComponent* owner)
-            : DocumentWindow(name, backgroundColour, buttons), ownerComponent(owner)
-        {
-        }
-
-        void closeButtonPressed() override
-        {
-            ownerComponent->settingsWindow = nullptr;
-        }
-
-    private:
-        MainComponent* ownerComponent;
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsWindowCloseButtonHandler)
-    };
+    CustomLookAndFeel customLookAndFeel; // Ensure this is a member variable
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
