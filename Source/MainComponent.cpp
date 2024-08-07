@@ -1,5 +1,8 @@
 #include "MainComponent.h"
 #include "CustomLookAndFeel.h"
+#include <algorithm>
+#include <vector>
+#include <ranges>
 
 //==============================================================================
 // Definition for SettingsWindowCloseButtonHandler class
@@ -25,10 +28,33 @@ private:
 //==============================================================================
 // Constructor for MainComponent
 MainComponent::MainComponent()
+    : settingsWindow(nullptr), midiDevicesEditor(nullptr),
+      keyboardState(), midiCollector(), midiMessages(), midiInputsOpened(),
+      fadeRateSlider(), disableFadeToggle(), scanButton(), noteColorSelector(),
+      midiDevicesList(), selectedMidiDevices(), selectedChannels(), midiDeviceToggles(), midiChannelToggles(), applyButton(),
+      instantUpdateToggle(), fadeRate(5.0f), noteColor(juce::Colours::white), customLookAndFeel(), instantUpdateMode(false)
 {
     setLookAndFeel(&customLookAndFeel);
     setSize(800, 600);
-    DBG("MainComponent constructed. Size: " + juce::String(getWidth()) + "x" + juce::String(getHeight()));
+
+    instantUpdateToggle.setButtonText("Instant Color Update");
+    instantUpdateToggle.setToggleState(false, juce::dontSendNotification);
+    instantUpdateToggle.addListener(this);
+
+    disableFadeToggle.setButtonText("Disable Fade");
+    disableFadeToggle.addListener(this);
+
+    enableMode1Button.setButtonText("Enable Mode 1");
+    enableMode1Button.addListener(this);
+
+    enableMode2Button.setButtonText("Enable Mode 2");
+    enableMode2Button.addListener(this);
+}
+
+// New method to initialize components
+void MainComponent::initialize()
+{
+    DBG("MainComponent initialized. Size: " + juce::String(getWidth()) + "x" + juce::String(getHeight()));
 
     if (juce::RuntimePermissions::isRequired(juce::RuntimePermissions::recordAudio)
         && !juce::RuntimePermissions::isGranted(juce::RuntimePermissions::recordAudio))
@@ -46,16 +72,12 @@ MainComponent::MainComponent()
     DBG("Opening selected MIDI inputs:");
     for (const auto& deviceName : selectedMidiDevices)
     {
-        // Changed to iterate through available devices to find the matching one
         auto availableDevices = juce::MidiInput::getAvailableDevices();
-        auto deviceInfo = std::find_if(availableDevices.begin(), availableDevices.end(),
-                                       [&](const auto& d) { return d.name == deviceName; });
+        auto deviceInfo = std::ranges::find_if(availableDevices, [&](const auto& d) { return d.name == deviceName; });
 
-        // Check if a valid device was found
         if (deviceInfo != availableDevices.end())
         {
             DBG("Found device info for: " + deviceName);
-            // Attempt to open the MIDI device
             if (auto midiInput = juce::MidiInput::openDevice(deviceInfo->identifier, this))
             {
                 midiInputsOpened.add(midiInput.release());
@@ -73,7 +95,7 @@ MainComponent::MainComponent()
         }
     }
 
-    fadeRateSlider.setRange(1.0, 20.0, 0.1);
+    fadeRateSlider.setRange(0.1, 20.0, 0.1);
     fadeRateSlider.setValue(5.0);
     fadeRateSlider.addListener(this);
     fadeRateSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::white);
@@ -83,7 +105,7 @@ MainComponent::MainComponent()
     disableFadeToggle.setButtonText("Disable Fade");
     disableFadeToggle.addListener(this);
 
-    fadeRate = fadeRateSlider.getValue();
+    fadeRate = static_cast<float>(fadeRateSlider.getValue());
 
     noteColorSelector.setCurrentColour(juce::Colours::white);
     noteColorSelector.addChangeListener(this);
@@ -92,21 +114,26 @@ MainComponent::MainComponent()
 
     scanButton.setButtonText("Scan");
     scanButton.addListener(this);
-    scanButton.setColour(juce::TextButton::buttonColourId, juce::Colours::lightblue); //  Set button background color
-    scanButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black); // Set text color when pressed
-    scanButton.setColour(juce::TextButton::textColourOffId, juce::Colours::black); // Set text color when not pressed
+    scanButton.setColour(juce::TextButton::buttonColourId, juce::Colours::lightblue);
+    scanButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+    scanButton.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
 
-    // Add APPLY button
     applyButton.setButtonText("Apply");
     applyButton.addListener(this);
     applyButton.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
     applyButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
     applyButton.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
 
-    // Open selected MIDI inputs based on checkbox state
-    //openSelectedMidiInputs();
-}
+    instantUpdateToggle.setButtonText("Instant Color Update");
+    instantUpdateToggle.setToggleState(false, juce::dontSendNotification);
+    instantUpdateToggle.addListener(this);
 
+    enableMode1Button.setButtonText("Enable Mode 1");
+    enableMode1Button.addListener(this);
+
+    enableMode2Button.setButtonText("Enable Mode 2");
+    enableMode2Button.addListener(this);
+}
 
 void MainComponent::openSelectedMidiInputs()
 {
@@ -115,8 +142,7 @@ void MainComponent::openSelectedMidiInputs()
     {
         // Changed to iterate through available devices to find the matching one
         auto availableDevices = juce::MidiInput::getAvailableDevices();
-        auto deviceInfo = std::find_if(availableDevices.begin(), availableDevices.end(),
-                                       [&](const auto& d) { return d.name == deviceName; });
+        auto deviceInfo = std::ranges::find_if(availableDevices, [&](const auto& d) { return d.name == deviceName; });
 
         // Check if a valid device was found
         if (deviceInfo != availableDevices.end())
@@ -185,6 +211,8 @@ void MainComponent::releaseResources()
 
 //==============================================================================
 // Method to paint the GUI
+//==============================================================================
+// Method to paint the GUI
 void MainComponent::paint(juce::Graphics& g)
 {
     // Fill the background
@@ -209,16 +237,14 @@ void MainComponent::paint(juce::Graphics& g)
         if (message.isNoteOn())
         {
             int noteNumber = message.getNoteNumber();
-            float velocity = message.getVelocity() / 127.0f;
-
-            float x = static_cast<float>(getWidth()) * noteNumber / 127.0f;
+            float velocity = static_cast<float>(message.getVelocity()) / 127.0f;
+            float x = static_cast<float>(getWidth()) * static_cast<float>(noteNumber) / 127.0f;
             float height = static_cast<float>(getHeight()) * velocity;
 
             juce::Colour noteColour = noteColor.withAlpha(alpha);
 
             g.setColour(noteColour);
 
-            // Add debug output for each note being drawn
             DBG("Drawing note: " + juce::String(noteNumber) + " at x: " + juce::String(x) + " with height: " + juce::String(height));
 
             juce::Path triangle;
@@ -233,16 +259,26 @@ void MainComponent::paint(juce::Graphics& g)
     }
 
     // Remove messages with alpha less than 0.01
-    midiMessages.erase(
-        std::remove_if(midiMessages.begin(), midiMessages.end(),
-                       [](const auto& pair) { return pair.second < 0.01f; }),
-        midiMessages.end());
+    std::erase_if(midiMessages, [](const auto& pair) { return pair.second < 0.01f; });
 }
 
 //==============================================================================
 // Method to handle component resizing
 void MainComponent::resized()
 {
+}
+
+//==============================================================================
+// Method to handle note color changes
+void MainComponent::noteColorChanged()
+{
+    noteColor = noteColorSelector.getCurrentColour();
+    DBG("Note color changed to: " + noteColor.toString());
+
+    if (instantUpdateMode) // X- Check the instant update mode
+    {
+        repaint(); // Repaint the component to reflect the new color immediately
+    }
 }
 
 void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message)
@@ -409,8 +445,7 @@ void MainComponent::applyMidiSelections()
     for (const auto& deviceName : selectedMidiDevices)
     {
         auto availableDevices = juce::MidiInput::getAvailableDevices();
-        auto deviceInfo = std::find_if(availableDevices.begin(), availableDevices.end(),
-                                       [&](const auto& d) { return d.name == deviceName; });
+        auto deviceInfo = std::ranges::find_if(availableDevices, [&](const auto& d) { return d.name == deviceName; });
 
         if (deviceInfo != availableDevices.end())
         {
@@ -434,7 +469,8 @@ void MainComponent::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &fadeRateSlider)
     {
-        fadeRate = fadeRateSlider.getValue();
+        // X- Explicitly cast the double value to float to avoid narrowing conversion warning.
+        fadeRate = static_cast<float>(fadeRateSlider.getValue());
     }
 }
 
@@ -444,10 +480,12 @@ void MainComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
 {
     if (source == &noteColorSelector)
     {
-        noteColor = noteColorSelector.getCurrentColour();
+        noteColorChanged(); // Call noteColorChanged when the color changes
     }
 }
 
+//==============================================================================
+// Override the Button::Listener method to handle toggle button changes
 //==============================================================================
 // Override the Button::Listener method to handle toggle button changes
 void MainComponent::buttonClicked(juce::Button* button)
@@ -497,12 +535,30 @@ void MainComponent::buttonClicked(juce::Button* button)
         DBG("Scan button clicked");
         refreshMidiInputs();
     }
-    // X- Add handling for the APPLY button
     else if (button == &applyButton)
     {
         DBG("Apply button clicked");
         updateMidiDeviceSelections();
         applyMidiSelections();
+    }
+    else if (button == &instantUpdateToggle)
+    {
+        DBG("Instant update toggle button clicked");
+        instantUpdateMode = instantUpdateToggle.getToggleState();
+        if (instantUpdateMode)
+        {
+            repaint();
+        }
+    }
+    else if (button == &enableMode1Button)
+    {
+        DBG("Enable Mode 1 button clicked");
+        // Add logic to handle enabling Mode 1
+    }
+    else if (button == &enableMode2Button)
+    {
+        DBG("Enable Mode 2 button clicked");
+        // Add logic to handle enabling Mode 2
     }
 
     DBG("Button click handling completed");
@@ -619,8 +675,6 @@ void MainComponent::showSettingsWindow()
     }
 }
 
-//==============================================================================
-// Method to refresh the settings window
 void MainComponent::refreshSettingsWindow()
 {
     DBG("Starting refreshSettingsWindow()");
@@ -653,6 +707,7 @@ void MainComponent::refreshSettingsWindow()
             return label.release();
         };
 
+        // MIDI Devices Section
         addLabel("MIDI Devices:");
 
         DBG("Refreshing MIDI device and channel toggles");
@@ -678,28 +733,45 @@ void MainComponent::refreshSettingsWindow()
             yPos += 30;
         }
 
-        DBG("Refreshing other controls");
+        // Scan and Apply Buttons
+        DBG("Adding Scan and Apply buttons");
         scanButton.setBounds(10, yPos, 185, 30);
         content->addAndMakeVisible(scanButton);
-
-        // X- Add APPLY button
         applyButton.setBounds(205, yPos, 185, 30);
         content->addAndMakeVisible(applyButton);
         yPos += 35;
 
+        // Fade Rate Slider
         addLabel("Fade Rate:");
         fadeRateSlider.setBounds(10, yPos, 380, 30);
         content->addAndMakeVisible(fadeRateSlider);
         yPos += 35;
 
+        // Disable Fade Toggle
+        DBG("Adding Disable Fade toggle");
         disableFadeToggle.setBounds(10, yPos, 380, 30);
         content->addAndMakeVisible(disableFadeToggle);
         yPos += 35;
 
+        // Note Color Selector
         addLabel("Note Color:");
         noteColorSelector.setBounds(10, yPos, 380, 300);
         content->addAndMakeVisible(noteColorSelector);
         yPos += 305;
+
+        // Instant Update Toggle
+        DBG("Adding Instant Update toggle");
+        instantUpdateToggle.setBounds(10, yPos, 380, 30);
+        content->addAndMakeVisible(instantUpdateToggle);
+        yPos += 35;
+
+        // Mode Buttons
+        DBG("Adding Mode buttons");
+        enableMode1Button.setBounds(10, yPos, 185, 30);
+        content->addAndMakeVisible(enableMode1Button);
+        enableMode2Button.setBounds(205, yPos, 185, 30);
+        content->addAndMakeVisible(enableMode2Button);
+        yPos += 35;
 
         DBG("Resizing content");
         content->setSize(400, yPos);
@@ -761,8 +833,5 @@ void MainComponent::fadeToggleChanged()
     {
         fadeRate = 0.0f; // Set fade rate to 0 if toggled on
     }
-    else
-    {
-        fadeRate = fadeRateSlider.getValue(); // Restore fade rate from slider
-    }
+
 }
