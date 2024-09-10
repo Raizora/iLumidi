@@ -2,6 +2,7 @@
 #define CUSTOMLOOKANDFEEL_H
 
 #include <JuceHeader.h>
+#include <juce_graphics/juce_graphics.h>
 
 class CustomLookAndFeel : public juce::LookAndFeel_V4
 {
@@ -113,8 +114,7 @@ public:
     void drawButtonText(juce::Graphics& g, juce::TextButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
     {
         auto fontSize = juce::jmin(15.0f, static_cast<float>(button.getHeight()) * 0.75f);
-        juce::Font font(juce::Font::getDefaultSansSerifFontName(), fontSize, juce::Font::plain); // Deprecated constructor
-
+        juce::Font font(juce::FontOptions().withHeight(static_cast<float>(fontSize)));
         g.setFont(font);
         g.setColour(button.findColour(button.getToggleState() ? juce::TextButton::textColourOnId
                                                               : juce::TextButton::textColourOffId));

@@ -43,12 +43,6 @@ MainComponent::MainComponent()
 
     disableFadeToggle.setButtonText("Disable Fade");
     disableFadeToggle.addListener(this);
-
-    enableMode1Button.setButtonText("Enable Mode 1");
-    enableMode1Button.addListener(this);
-
-    enableMode2Button.setButtonText("Enable Mode 2");
-    enableMode2Button.addListener(this);
 }
 
 // New method to initialize components
@@ -130,9 +124,12 @@ void MainComponent::initialize()
 
     enableMode1Button.setButtonText("Enable Mode 1");
     enableMode1Button.addListener(this);
+    addAndMakeVisible(&enableMode1Button);
 
     enableMode2Button.setButtonText("Enable Mode 2");
     enableMode2Button.addListener(this);
+    addAndMakeVisible(&enableMode2Button);
+
 }
 
 void MainComponent::openSelectedMidiInputs()
@@ -565,115 +562,6 @@ void MainComponent::buttonClicked(juce::Button* button)
 }
 
 //==============================================================================
-void MainComponent::showSettingsWindow()
-{
-    DBG("Showing settings window");
-    if (settingsWindow == nullptr)
-    {
-        DBG("Creating new settings window");
-        auto settingsContent = std::make_unique<juce::Component>();
-        settingsContent->setColour(juce::ResizableWindow::backgroundColourId, juce::Colours::white);
-
-        // Add components to settingsContent
-        int yPos = 10;
-
-        auto addLabel = [&](const juce::String& text) {
-            auto label = std::make_unique<juce::Label>();
-            label->setText(text, juce::dontSendNotification);
-            label->setBounds(10, yPos, 380, 20);
-            settingsContent->addAndMakeVisible(*label);
-            yPos += 25;
-            return label.release();
-        };
-
-        addLabel("MIDI Devices:");
-
-        DBG("Adding MIDI device and channel toggles");
-        for (int i = 0; i < midiDeviceToggles.size(); ++i)
-        {
-            auto* deviceToggle = midiDeviceToggles[i];
-            deviceToggle->setBounds(10, yPos, 380, 20);
-            settingsContent->addAndMakeVisible(deviceToggle);
-            yPos += 25;
-
-            auto* channelToggles = midiChannelToggles[i];
-            for (int j = 0; j < channelToggles->size(); ++j)
-            {
-                auto* channelToggle = (*channelToggles)[j];
-                channelToggle->setBounds(30 + (j % 8) * 45, yPos, 40, 20);
-                settingsContent->addAndMakeVisible(channelToggle);
-
-                if (j % 8 == 7)
-                {
-                    yPos += 25;
-                }
-            }
-            yPos += 30;
-        }
-
-        DBG("Adding other controls");
-        scanButton.setBounds(10, yPos, 185, 30);
-        settingsContent->addAndMakeVisible(scanButton);
-        // X- Add APPLY button
-        applyButton.setBounds(205, yPos, 185, 30);
-        settingsContent->addAndMakeVisible(applyButton);
-        yPos += 35;
-
-        addLabel("Fade Rate:");
-        fadeRateSlider.setBounds(10, yPos, 380, 30);
-        settingsContent->addAndMakeVisible(fadeRateSlider);
-        yPos += 35;
-
-        disableFadeToggle.setBounds(10, yPos, 380, 30);
-        settingsContent->addAndMakeVisible(disableFadeToggle);
-        yPos += 35;
-
-        addLabel("Note Color:");
-        noteColorSelector.setBounds(10, yPos, 380, 300);
-        settingsContent->addAndMakeVisible(noteColorSelector);
-        yPos += 305;
-
-        DBG("Setting content size");
-        settingsContent->setSize(400, yPos);
-
-        // Changed to use a custom DocumentWindow subclass
-        class SettingsWindow : public juce::DocumentWindow
-        {
-        public:
-            SettingsWindow(const juce::String& name, juce::Colour backgroundColour, int buttonsNeeded, MainComponent* owner)
-                : DocumentWindow(name, backgroundColour, buttonsNeeded), owner(owner)
-            {
-            }
-
-            void closeButtonPressed() override
-            {
-                DBG("Settings window close button pressed");
-                owner->settingsWindow = nullptr;
-            }
-
-        private:
-            MainComponent* owner;
-        };
-
-        DBG("Creating SettingsWindow");
-        settingsWindow = std::make_unique<SettingsWindow>("Settings",
-                                                          juce::Colours::white,
-                                                          juce::DocumentWindow::allButtons,
-                                                          this);
-        settingsWindow->setContentOwned(settingsContent.release(), true);
-        settingsWindow->setUsingNativeTitleBar(true);
-        settingsWindow->setResizable(true, true);
-        settingsWindow->centreWithSize(400, yPos);
-
-        DBG("Making settings window visible");
-        settingsWindow->setVisible(true);
-    }
-    else
-    {
-        DBG("Bringing existing settings window to front");
-        settingsWindow->toFront(true);
-    }
-}
 
 void MainComponent::refreshSettingsWindow()
 {
@@ -789,7 +677,104 @@ void MainComponent::refreshSettingsWindow()
     }
 }
 
+// Show settingsWindow definition
+class SettingsWindow : public juce::DocumentWindow
+{
+public:
+    // Constructor
+    SettingsWindow(const juce::String& name, juce::Colour backgroundColour, int buttonsNeeded, MainComponent* owner)
+        : DocumentWindow(name, backgroundColour, buttonsNeeded), ownerComponent(owner)
+    {
+        setUsingNativeTitleBar(true);    // Use the native OS title bar
+        setResizable(true, true);        // Make the window resizable
+        setVisible(true);                // Make the window visible
+    }
+
+private:
+    MainComponent* ownerComponent;  // Reference to MainComponent
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsWindow)  // Prevent copying
+};
+
 //==============================================================================
+void MainComponent::showSettingsWindow()
+{
+    DBG("Showing settings window");
+
+    // Only create the settings window once if it doesn't exist
+    if (settingsWindow == nullptr)
+    {
+        DBG("Creating new settings window");
+        auto settingsContent = std::make_unique<juce::Component>();
+        settingsContent->setColour(juce::ResizableWindow::backgroundColourId, juce::Colours::white);
+
+        // Add components to settingsContent
+        int yPos = 10;
+
+        auto addLabel = [&](const juce::String& text) {
+            auto label = std::make_unique<juce::Label>();
+            label->setText(text, juce::dontSendNotification);
+            label->setBounds(10, yPos, 380, 20);
+            settingsContent->addAndMakeVisible(*label);
+            yPos += 25;
+            return label.release();
+        };
+
+        // Add labels and other components here
+        addLabel("MIDI Devices:");
+
+        // Add the scan button
+        scanButton.setBounds(10, yPos, 185, 30);
+        settingsContent->addAndMakeVisible(scanButton);
+        applyButton.setBounds(205, yPos, 185, 30);
+        settingsContent->addAndMakeVisible(applyButton);
+        yPos += 35;
+
+        addLabel("Fade Rate:");
+        fadeRateSlider.setBounds(10, yPos, 380, 30);
+        settingsContent->addAndMakeVisible(fadeRateSlider);
+        yPos += 35;
+
+        disableFadeToggle.setBounds(10, yPos, 380, 30);
+        settingsContent->addAndMakeVisible(disableFadeToggle);
+        yPos += 35;
+
+        addLabel("Note Color:");
+        noteColorSelector.setBounds(10, yPos, 380, 300);
+        settingsContent->addAndMakeVisible(noteColorSelector);
+        yPos += 305;
+
+        // Mode buttons (Enable Mode 1 and Enable Mode 2)
+        enableMode1Button.setBounds(10, yPos, 185, 30);
+        settingsContent->addAndMakeVisible(enableMode1Button);
+        enableMode2Button.setBounds(205, yPos, 185, 30);
+        settingsContent->addAndMakeVisible(enableMode2Button);
+        yPos += 35;
+
+        // Set the size of the content
+        settingsContent->setSize(400, yPos);
+
+        // Create and configure the settings window
+        settingsWindow = std::make_unique<SettingsWindow>("Settings",
+                                                          juce::Colours::white,
+                                                          juce::DocumentWindow::allButtons,
+                                                          this);
+        settingsWindow->setContentOwned(settingsContent.release(), true);
+        settingsWindow->setUsingNativeTitleBar(true);
+        settingsWindow->setResizable(true, true);
+        settingsWindow->centreWithSize(400, yPos);
+
+        // Make the settings window visible
+        settingsWindow->setVisible(true);
+    }
+    else
+    {
+        // If the window already exists, just bring it to the front
+        DBG("Bringing existing settings window to front");
+        settingsWindow->toFront(true);
+    }
+}
+
 // Method to update the MIDI device selections
 void MainComponent::updateMidiDeviceSelections()
 {

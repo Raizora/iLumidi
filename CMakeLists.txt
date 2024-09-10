@@ -11,15 +11,14 @@ include_directories("${CMAKE_SOURCE_DIR}/JuceLibraryCode")
 # Add JUCE subdirectory
 add_subdirectory(${JUCE_DIR} ${CMAKE_BINARY_DIR}/JUCE)
 
-
-
-# Main executable with absolute paths
-add_executable(iLumidi
-        "/Users/jamiebenchia/JUCE Projects/iLumidi/Source/Main.cpp"
-        "/Users/jamiebenchia/JUCE Projects/iLumidi/Source/MainComponent.cpp"
-        "/Users/jamiebenchia/JUCE Projects/iLumidi/Source/MainComponent.h"
-        Source/CustomLookAndFeel.h
+# Use file(GLOB ...) to find source files
+file(GLOB SOURCE_FILES
+        "${CMAKE_SOURCE_DIR}/Source/*.cpp"
+        "${CMAKE_SOURCE_DIR}/Source/*.h"
 )
+
+# Main executable with GLOB-ed source files
+add_executable(iLumidi ${SOURCE_FILES})
 
 # Link to the required JUCE modules
 target_link_libraries(iLumidi
