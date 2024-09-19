@@ -5,7 +5,6 @@
 #include <ranges>
 
 //==============================================================================
-// Definition for SettingsWindowCloseButtonHandler class
 class MainComponent::SettingsWindowCloseButtonHandler : public juce::DocumentWindow
 {
 public:
@@ -16,7 +15,12 @@ public:
 
     void closeButtonPressed() override
     {
-        ownerComponent->settingsWindow = nullptr;
+        if (ownerComponent != nullptr)
+        {
+            DBG("SettingsWindowCloseButtonHandler: Setting settingsWindow to nullptr");
+            ownerComponent->settingsWindow = nullptr;
+        }
+        setVisible(false);
     }
 
 private:
@@ -26,13 +30,12 @@ private:
 };
 
 //==============================================================================
-// Constructor for MainComponent
 MainComponent::MainComponent()
-    : settingsWindow(nullptr), midiDevicesEditor(nullptr),
-      keyboardState(), midiCollector(), midiMessages(), midiInputsOpened(),
+    : settingsWindow(nullptr),
       fadeRateSlider(), disableFadeToggle(), scanButton(), noteColorSelector(),
-      midiDevicesList(), selectedMidiDevices(), selectedChannels(), midiDeviceToggles(), midiChannelToggles(), applyButton(),
-      instantUpdateToggle(), fadeRate(5.0f), noteColor(juce::Colours::white), customLookAndFeel(), instantUpdateMode(false)
+      applyButton(),
+      instantUpdateToggle(),
+      fadeRate(5.0f), noteColor(juce::Colours::white), customLookAndFeel(), instantUpdateMode(false)
 {
     setLookAndFeel(&customLookAndFeel);
     setSize(800, 600);
@@ -45,49 +48,14 @@ MainComponent::MainComponent()
     disableFadeToggle.addListener(this);
 }
 
-// New method to initialize components
 void MainComponent::initialize()
 {
     DBG("MainComponent initialized. Size: " + juce::String(getWidth()) + "x" + juce::String(getHeight()));
 
-    if (juce::RuntimePermissions::isRequired(juce::RuntimePermissions::recordAudio)
-        && !juce::RuntimePermissions::isGranted(juce::RuntimePermissions::recordAudio))
-    {
-        juce::RuntimePermissions::request(juce::RuntimePermissions::recordAudio,
-            [&](bool granted) { setAudioChannels(granted ? 2 : 0, 2); });
-    }
-    else
-    {
-        setAudioChannels(2, 2);
-    }
-
     refreshMidiInputs();
 
     DBG("Opening selected MIDI inputs:");
-    for (const auto& deviceName : selectedMidiDevices)
-    {
-        auto availableDevices = juce::MidiInput::getAvailableDevices();
-        auto deviceInfo = std::ranges::find_if(availableDevices, [&](const auto& d) { return d.name == deviceName; });
-
-        if (deviceInfo != availableDevices.end())
-        {
-            DBG("Found device info for: " + deviceName);
-            if (auto midiInput = juce::MidiInput::openDevice(deviceInfo->identifier, this))
-            {
-                midiInputsOpened.add(midiInput.release());
-                midiInputsOpened.getLast()->start();
-                DBG("Opened and started MIDI device: " + deviceName);
-            }
-            else
-            {
-                DBG("Failed to open MIDI device: " + deviceName);
-            }
-        }
-        else
-        {
-            DBG("Could not find device info for: " + deviceName);
-        }
-    }
+    openSelectedMidiInputs();
 
     fadeRateSlider.setRange(0.1, 20.0, 0.1);
     fadeRateSlider.setValue(5.0);
@@ -129,98 +97,57 @@ void MainComponent::initialize()
     enableMode2Button.setButtonText("Enable Mode 2");
     enableMode2Button.addListener(this);
     addAndMakeVisible(&enableMode2Button);
-
 }
-
-void MainComponent::openSelectedMidiInputs()
-{
-    DBG("Opening selected MIDI inputs:");
-    for (const auto& deviceName : selectedMidiDevices)
-    {
-        // Changed to iterate through available devices to find the matching one
-        auto availableDevices = juce::MidiInput::getAvailableDevices();
-        auto deviceInfo = std::ranges::find_if(availableDevices, [&](const auto& d) { return d.name == deviceName; });
-
-        // Check if a valid device was found
-        if (deviceInfo != availableDevices.end())
-        {
-            // Attempt to open the MIDI device
-            if (auto midiInput = juce::MidiInput::openDevice(deviceInfo->identifier, this))
-            {
-                midiInputsOpened.add(midiInput.release());
-                midiInputsOpened.getLast()->start();
-                DBG("Opened and started MIDI device: " + deviceName);
-            }
-            else
-            {
-                DBG("Failed to open MIDI device: " + deviceName);
-            }
-        }
-        else
-        {
-            DBG("Could not find device info for: " + deviceName);
-        }
-    }
-}
-
 
 //==============================================================================
-// Destructor for MainComponent
 MainComponent::~MainComponent()
 {
-    setLookAndFeel(nullptr); // Clean up custom look and feel
-    shutdownAudio();
+    // **Remove listeners to prevent dangling references**
+    fadeRateSlider.removeListener(this);
+    disableFadeToggle.removeListener(this);
+    scanButton.removeListener(this);
+    applyButton.removeListener(this);
+    noteColorSelector.removeChangeListener(this);
+    instantUpdateToggle.removeListener(this);
+    enableMode1Button.removeListener(this);
+    enableMode2Button.removeListener(this);
+
+    for (auto* deviceToggle : midiDeviceToggles)
+        deviceToggle->removeListener(this);
+
+    for (auto* channelToggles : midiChannelToggles)
+        for (auto* channelToggle : *channelToggles)
+            channelToggle->removeListener(this);
+
+    setLookAndFeel(nullptr);
 
     for (auto* device : midiInputsOpened)
     {
         if (device != nullptr)
-        {
             device->stop();
-        }
     }
     midiInputsOpened.clear(true);
+
+    if (settingsWindow != nullptr)
+    {
+        DBG("MainComponent Destructor: Hiding and resetting settingsWindow");
+        settingsWindow->setVisible(false);
+        settingsWindow.reset();
+    }
 }
 
 //==============================================================================
-// Method to prepare the audio playback
-void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
-{
-    midiCollector.reset(sampleRate);
-}
-
-//==============================================================================
-// Method to process audio blocks
-void MainComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
-{
-    bufferToFill.clearActiveBufferRegion();
-
-    juce::MidiBuffer midiBuffer;
-    midiCollector.removeNextBlockOfMessages(midiBuffer, bufferToFill.numSamples);
-
-    keyboardState.processNextMidiBuffer(midiBuffer, 0, bufferToFill.numSamples, true);
-}
-
-//==============================================================================
-// Method to release audio resources
-void MainComponent::releaseResources()
-{
-}
-
-//==============================================================================
-// Method to paint the GUI
-//==============================================================================
-// Method to paint the GUI
 void MainComponent::paint(juce::Graphics& g)
 {
     // Fill the background
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 
-    // Further reduced paint call logging
+    // Reduced paint call logging
     static int paintCallCount = 0;
     static juce::uint32 lastPaintTime = 0;
     juce::uint32 currentTime = juce::Time::getMillisecondCounter();
 
-    if (currentTime - lastPaintTime > 1000 || !midiMessages.empty())  // Log at most once per second or when there are messages
+    if (currentTime - lastPaintTime > 1000 || !midiMessages.empty())
     {
         DBG("Paint called (" + juce::String(++paintCallCount) + "). Number of MIDI messages: " + juce::String(midiMessages.size()));
         lastPaintTime = currentTime;
@@ -242,8 +169,6 @@ void MainComponent::paint(juce::Graphics& g)
 
             g.setColour(noteColour);
 
-            DBG("Drawing note: " + juce::String(noteNumber) + " at x: " + juce::String(x) + " with height: " + juce::String(height));
-
             juce::Path triangle;
             triangle.addTriangle(x, static_cast<float>(getHeight()) - height, x + 10.0f, static_cast<float>(getHeight()), x - 10.0f, static_cast<float>(getHeight()));
             g.fillPath(triangle);
@@ -260,21 +185,23 @@ void MainComponent::paint(juce::Graphics& g)
 }
 
 //==============================================================================
-// Method to handle component resizing
 void MainComponent::resized()
 {
+    auto area = getLocalBounds().reduced(10);
+    enableMode1Button.setBounds(area.removeFromTop(30));
+    enableMode2Button.setBounds(area.removeFromTop(30));
+    // Layout other components accordingly
 }
 
 //==============================================================================
-// Method to handle note color changes
 void MainComponent::noteColorChanged()
 {
     noteColor = noteColorSelector.getCurrentColour();
     DBG("Note color changed to: " + noteColor.toString());
 
-    if (instantUpdateMode) // X- Check the instant update mode
+    if (instantUpdateMode)
     {
-        repaint(); // Repaint the component to reflect the new color immediately
+        repaint();
     }
 }
 
@@ -282,43 +209,13 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
 {
     DBG("Incoming MIDI Message from: " + source->getName() + " Channel: " + juce::String(message.getChannel()));
 
-    // Only update selections if they've changed
-    static juce::String lastSelectedDevices;
-    static juce::String lastSelectedChannels;
-
-    // Replace joinIntoString with manual string construction for selectedMidiDevices
-    juce::String currentSelectedDevices;
-    for (const auto& device : selectedMidiDevices)
-        currentSelectedDevices += device + ", ";
-    // Remove trailing ", " if the string is not empty
-    if (currentSelectedDevices.isNotEmpty())
-        currentSelectedDevices = currentSelectedDevices.dropLastCharacters(2);
-
-    // Replace joinIntoString with manual string construction for selectedChannels
-    juce::String currentSelectedChannels;
-    for (const auto& channel : selectedChannels)
-        currentSelectedChannels += juce::String(channel) + ", ";
-    // Remove trailing ", " if the string is not empty
-    if (currentSelectedChannels.isNotEmpty())
-        currentSelectedChannels = currentSelectedChannels.dropLastCharacters(2);
-
-    // Check if the selections have changed
-    if (currentSelectedDevices != lastSelectedDevices || currentSelectedChannels != lastSelectedChannels)
-    {
-        updateMidiDeviceSelections();
-        lastSelectedDevices = currentSelectedDevices;
-        lastSelectedChannels = currentSelectedChannels;
-
-        DBG("Selected MIDI Devices: " + currentSelectedDevices);
-        DBG("Selected Channels: " + currentSelectedChannels);
-    }
+    updateMidiDeviceSelections();
 
     // Process the MIDI message if it's from a selected device and channel
     if (selectedMidiDevices.contains(source->getName()) &&
         (selectedChannels.isEmpty() || selectedChannels.contains(message.getChannel())))
     {
-        DBG("Adding message to queue and processing MIDI message");
-        midiCollector.addMessageToQueue(message);
+        DBG("Processing MIDI message");
         processMidiMessage(message);
     }
     else
@@ -328,7 +225,6 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
 }
 
 //==============================================================================
-// Method to process MIDI messages and update visuals
 void MainComponent::processMidiMessage(const juce::MidiMessage& message)
 {
     DBG("Processing MIDI message; Note ON: " + juce::String(message.getNoteNumber()) + ", Channel: " + juce::String(message.getChannel()));
@@ -345,26 +241,28 @@ void MainComponent::processMidiMessage(const juce::MidiMessage& message)
     }
 
     // Ensure repaint is called after processing a message
-    DBG("Calling repaint after processing MIDI message");
-    repaint();
+    if (!isTimerRunning())
+        startTimerHz(60); // Repaint at 60 FPS
 }
 
 //==============================================================================
-// Method called periodically by the timer
 void MainComponent::timerCallback()
 {
     repaint();
+
+    // Stop the timer if there are no MIDI messages to process
+    if (midiMessages.empty())
+        stopTimer();
 }
 
 //==============================================================================
-// Method to refresh the list of available MIDI inputs
 void MainComponent::refreshMidiInputs()
 {
     DBG("Starting refreshMidiInputs()");
     auto midiInputs = juce::MidiInput::getAvailableDevices();
     DBG("Refreshing MIDI Inputs:");
 
-    // X- Update to not change the state of existing toggles
+    // Update MIDI devices
     for (const auto& input : midiInputs)
     {
         DBG("Found MIDI input: " + input.name + " (ID: " + input.identifier + ")");
@@ -372,33 +270,32 @@ void MainComponent::refreshMidiInputs()
         int existingIndex = midiDevicesList.indexOf(input.name);
         if (existingIndex != -1)
         {
-            // Device already exists, keep its current state
             continue;
         }
 
         midiDevicesList.add(input.name);
 
-        auto* deviceToggle = new juce::ToggleButton(input.name);
+        auto deviceToggle = std::make_unique<juce::ToggleButton>(input.name);
         deviceToggle->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
         deviceToggle->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
         deviceToggle->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
         deviceToggle->addListener(this);
-        midiDeviceToggles.add(deviceToggle);
+        midiDeviceToggles.add(deviceToggle.release());
 
-        auto* channelToggles = new juce::OwnedArray<juce::ToggleButton>();
+        auto channelToggles = std::make_unique<juce::OwnedArray<juce::ToggleButton>>();
         for (int i = 1; i <= 16; ++i)
         {
-            auto* channelToggle = new juce::ToggleButton("Ch " + juce::String(i));
+            auto channelToggle = std::make_unique<juce::ToggleButton>("Ch " + juce::String(i));
             channelToggle->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
             channelToggle->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
             channelToggle->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
             channelToggle->addListener(this);
-            channelToggles->add(channelToggle);
+            channelToggles->add(channelToggle.release());
         }
-        midiChannelToggles.add(channelToggles);
+        midiChannelToggles.add(channelToggles.release());
     }
 
-    // X- Remove any devices that are no longer present
+    // Remove devices that are no longer present
     for (int i = midiDevicesList.size() - 1; i >= 0; --i)
     {
         bool deviceStillPresent = false;
@@ -424,14 +321,12 @@ void MainComponent::refreshMidiInputs()
     juce::MessageManager::callAsync([this] { refreshSettingsWindow(); });
 
     DBG("Finished refreshMidiInputs()");
-    // X- Remove the call to openSelectedMidiInputs() from here
-    // openSelectedMidiInputs();
 }
+
 //==============================================================================
-// X- New method to apply MIDI selections
 void MainComponent::applyMidiSelections()
 {
-    // First, close all currently open MIDI inputs
+    // Close all currently open MIDI inputs
     for (auto* device : midiInputsOpened)
     {
         device->stop();
@@ -439,52 +334,28 @@ void MainComponent::applyMidiSelections()
     midiInputsOpened.clear();
 
     // Now open the newly selected MIDI inputs
-    for (const auto& deviceName : selectedMidiDevices)
-    {
-        auto availableDevices = juce::MidiInput::getAvailableDevices();
-        auto deviceInfo = std::ranges::find_if(availableDevices, [&](const auto& d) { return d.name == deviceName; });
-
-        if (deviceInfo != availableDevices.end())
-        {
-            if (auto midiInput = juce::MidiInput::openDevice(deviceInfo->identifier, this))
-            {
-                midiInputsOpened.add(midiInput.release());
-                midiInputsOpened.getLast()->start();
-                DBG("Opened and started MIDI device: " + deviceName);
-            }
-            else
-            {
-                DBG("Failed to open MIDI device: " + deviceName);
-            }
-        }
-    }
+    openSelectedMidiInputs();
 }
 
 //==============================================================================
-// Method to handle slider value changes
 void MainComponent::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &fadeRateSlider)
     {
-        // X- Explicitly cast the double value to float to avoid narrowing conversion warning.
         fadeRate = static_cast<float>(fadeRateSlider.getValue());
     }
 }
 
 //==============================================================================
-// Method to handle color picker changes
 void MainComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
 {
     if (source == &noteColorSelector)
     {
-        noteColorChanged(); // Call noteColorChanged when the color changes
+        noteColorChanged();
     }
 }
 
 //==============================================================================
-// Override the Button::Listener method to handle toggle button changes
-//==============================================================================
-// Override the Button::Listener method to handle toggle button changes
 void MainComponent::buttonClicked(juce::Button* button)
 {
     DBG("Button clicked: " + button->getName());
@@ -562,7 +433,6 @@ void MainComponent::buttonClicked(juce::Button* button)
 }
 
 //==============================================================================
-
 void MainComponent::refreshSettingsWindow()
 {
     DBG("Starting refreshSettingsWindow()");
@@ -583,6 +453,7 @@ void MainComponent::refreshSettingsWindow()
 
         DBG("Clearing existing content");
         content->removeAllChildren();
+        ownedSettingsComponents.clear();
 
         int yPos = 10;
 
@@ -590,9 +461,9 @@ void MainComponent::refreshSettingsWindow()
             auto label = std::make_unique<juce::Label>();
             label->setText(text, juce::dontSendNotification);
             label->setBounds(10, yPos, 380, 20);
-            content->addAndMakeVisible(*label);
+            content->addAndMakeVisible(label.get());
+            ownedSettingsComponents.add(label.release());
             yPos += 25;
-            return label.release();
         };
 
         // MIDI Devices Section
@@ -677,23 +548,34 @@ void MainComponent::refreshSettingsWindow()
     }
 }
 
-// Show settingsWindow definition
+//==============================================================================
 class SettingsWindow : public juce::DocumentWindow
 {
 public:
-    // Constructor
     SettingsWindow(const juce::String& name, juce::Colour backgroundColour, int buttonsNeeded, MainComponent* owner)
-        : DocumentWindow(name, backgroundColour, buttonsNeeded), ownerComponent(owner)
+        : juce::DocumentWindow(name, backgroundColour, buttonsNeeded), ownerComponent(owner)
     {
-        setUsingNativeTitleBar(true);    // Use the native OS title bar
-        setResizable(true, true);        // Make the window resizable
-        setVisible(true);                // Make the window visible
+        setUsingNativeTitleBar(true);
+        setResizable(true, true);
+    }
+
+    void closeButtonPressed() override
+    {
+        setVisible(false);
+        if (onCloseCallback)
+            onCloseCallback();
+    }
+
+    void setOnCloseCallback(std::function<void()> callback)
+    {
+        onCloseCallback = std::move(callback);
     }
 
 private:
-    MainComponent* ownerComponent;  // Reference to MainComponent
+    MainComponent* ownerComponent;
+    std::function<void()> onCloseCallback;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsWindow)  // Prevent copying
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsWindow)
 };
 
 //==============================================================================
@@ -701,31 +583,32 @@ void MainComponent::showSettingsWindow()
 {
     DBG("Showing settings window");
 
-    // Only create the settings window once if it doesn't exist
     if (settingsWindow == nullptr)
     {
         DBG("Creating new settings window");
         auto settingsContent = std::make_unique<juce::Component>();
         settingsContent->setColour(juce::ResizableWindow::backgroundColourId, juce::Colours::white);
 
-        // Add components to settingsContent
         int yPos = 10;
 
         auto addLabel = [&](const juce::String& text) {
             auto label = std::make_unique<juce::Label>();
             label->setText(text, juce::dontSendNotification);
             label->setBounds(10, yPos, 380, 20);
-            settingsContent->addAndMakeVisible(*label);
+            settingsContent->addAndMakeVisible(label.get());
+            ownedSettingsComponents.add(label.release());
             yPos += 25;
-            return label.release();
         };
 
         // Add labels and other components here
         addLabel("MIDI Devices:");
 
         // Add the scan button
+        scanButton.setButtonText("Scan for MIDI Devices");
         scanButton.setBounds(10, yPos, 185, 30);
         settingsContent->addAndMakeVisible(scanButton);
+
+        applyButton.setButtonText("Apply MIDI Selections");
         applyButton.setBounds(205, yPos, 185, 30);
         settingsContent->addAndMakeVisible(applyButton);
         yPos += 35;
@@ -743,6 +626,11 @@ void MainComponent::showSettingsWindow()
         noteColorSelector.setBounds(10, yPos, 380, 300);
         settingsContent->addAndMakeVisible(noteColorSelector);
         yPos += 305;
+
+        // Instant Update Toggle
+        instantUpdateToggle.setBounds(10, yPos, 380, 30);
+        settingsContent->addAndMakeVisible(instantUpdateToggle);
+        yPos += 35;
 
         // Mode buttons (Enable Mode 1 and Enable Mode 2)
         enableMode1Button.setBounds(10, yPos, 185, 30);
@@ -766,16 +654,27 @@ void MainComponent::showSettingsWindow()
 
         // Make the settings window visible
         settingsWindow->setVisible(true);
+
+        // Scan for MIDI devices/channels when the settings window is first created
+        refreshMidiInputs();
     }
     else
     {
-        // If the window already exists, just bring it to the front
         DBG("Bringing existing settings window to front");
         settingsWindow->toFront(true);
+        settingsWindow->setVisible(true);
+    }
+
+    // Set up the closing behavior
+    if (auto* settingsWin = dynamic_cast<SettingsWindow*>(settingsWindow.get()))
+    {
+        settingsWin->setOnCloseCallback([this]() {
+            settingsWindow = nullptr;
+        });
     }
 }
 
-// Method to update the MIDI device selections
+//==============================================================================
 void MainComponent::updateMidiDeviceSelections()
 {
     selectedMidiDevices.clear();
@@ -810,13 +709,47 @@ void MainComponent::updateMidiDeviceSelections()
         DBG(" - Channel " + juce::String(channel));
     }
 }
+
 //==============================================================================
-// Method to handle fade toggle changes
 void MainComponent::fadeToggleChanged()
 {
     if (disableFadeToggle.getToggleState())
     {
-        fadeRate = 0.0f; // Set fade rate to 0 if toggled on
+        fadeRate = 0.0f;
     }
+    else
+    {
+        fadeRate = static_cast<float>(fadeRateSlider.getValue());
+    }
+}
 
+//==============================================================================
+void MainComponent::openSelectedMidiInputs()
+{
+    DBG("Opening selected MIDI inputs:");
+    for (const auto& deviceName : selectedMidiDevices)
+    {
+        // Check if the device is already opened
+        bool isAlreadyOpened = std::any_of(midiInputsOpened.begin(), midiInputsOpened.end(),
+                                           [&](juce::MidiInput* input) { return input->getName() == deviceName; });
+        if (isAlreadyOpened)
+            continue;
+
+        auto availableDevices = juce::MidiInput::getAvailableDevices();
+        auto deviceInfo = std::ranges::find_if(availableDevices, [&](const auto& d) { return d.name == deviceName; });
+
+        if (deviceInfo != availableDevices.end())
+        {
+            if (auto midiInput = juce::MidiInput::openDevice(deviceInfo->identifier, this))
+            {
+                midiInputsOpened.add(midiInput.release());
+                midiInputsOpened.getLast()->start();
+                DBG("Opened and started MIDI device: " + deviceName);
+            }
+            else
+            {
+                DBG("Failed to open MIDI device: " + deviceName);
+            }
+        }
+    }
 }

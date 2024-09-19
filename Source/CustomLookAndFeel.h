@@ -2,7 +2,6 @@
 #define CUSTOMLOOKANDFEEL_H
 
 #include <JuceHeader.h>
-#include <juce_graphics/juce_graphics.h>
 
 class CustomLookAndFeel : public juce::LookAndFeel_V4
 {
@@ -10,27 +9,27 @@ public:
     void drawResizableFrame(juce::Graphics& g, int w, int h, const juce::BorderSize<int>& border) override
     {
         g.setColour(juce::Colours::blueviolet);
-        g.drawRect(10, 10, w, h, 4); // Draw thicker border with thickness 4
+        g.drawRect(10, 10, w, h, 4);
     }
 
     void drawStretchableLayoutResizerBar(juce::Graphics& g, int w, int h, bool isVerticalBar, bool isMouseOver, bool isMouseDragging) override
     {
         if (isMouseOver || isMouseDragging)
-            g.fillAll(juce::Colours::lightblue); // Set color for resizer indicator when hovered or dragging
+            g.fillAll(juce::Colours::lightblue);
         else
-            g.fillAll(juce::Colours::grey); // Default color for resizer indicator
+            g.fillAll(juce::Colours::grey);
 
         g.setColour(juce::Colours::darkgrey);
 
         if (isVerticalBar)
         {
             for (int i = 3; i < h; i += 5)
-                g.drawRect(0, i, w, 2); // Draw horizontal lines for vertical bar with thicker lines
+                g.drawRect(0, i, w, 2);
         }
         else
         {
             for (int i = 3; i < w; i += 5)
-                g.drawRect(i, 00 , 20, h); // Draw vertical lines for horizontal bar with thicker lines
+                g.drawRect(i, 0, 2, h);
         }
     }
 
@@ -95,7 +94,6 @@ public:
         g.drawRect(label.getLocalBounds());
     }
 
-    // Customizing button appearance
     void drawButtonBackground(juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
     {
         auto buttonArea = button.getLocalBounds().toFloat();

@@ -1,0 +1,20 @@
+/** CLion Shortcuts **/
+Command + 1: Show/Hide Project tool window
+Command + 2: Show/Hide Favorites tool window
+Command + 3: Show/Hide Find tool window
+Command + 4: Show/Hide Run tool window
+Command + 5: Show/Hide Debug tool window
+Command + 6: Show/Hide Problems tool window
+Command + 7: Show/Hide Structure tool window
+Command + 8: Show/Hide Services tool window
+Command + 9: Show/Hide Version Control tool window
+Option + F12: Show/Hide Terminal
+Command + ,: Open Preferences
+Command + .: Hide All Tool Windows
+
+1.
+Remove the "mode 1" and "mode 2" buttons from your MainComponent class declaration.
+2.
+Remove any related member variables or functions that handle these modes.
+3.
+Delete the code that creates, positions, and handles events for these buttons in your MainComponent implementation.
