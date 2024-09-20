@@ -32,10 +32,7 @@ private:
 //==============================================================================
 MainComponent::MainComponent()
     : settingsWindow(nullptr),
-      fadeRateSlider(), disableFadeToggle(), scanButton(), noteColorSelector(),
-      applyButton(),
-      instantUpdateToggle(),
-      fadeRate(5.0f), noteColor(juce::Colours::white), customLookAndFeel(), instantUpdateMode(false)
+      fadeRate(5.0f), noteColor(juce::Colours::white)
 {
     setLookAndFeel(&customLookAndFeel);
     setSize(800, 600);
@@ -52,6 +49,12 @@ void MainComponent::initialize()
 {
     DBG("MainComponent initialized. Size: " + juce::String(getWidth()) + "x" + juce::String(getHeight()));
 
+    // Enable MIDI debug messages -----------------------------------------------------------------------***********
+    debugMidiMessages = false;
+    debugMidiProcessing = false;
+    enableNoteEventCount = false;
+    // --------------------------------------------------------------------------------------------------***********
+
     refreshMidiInputs();
 
     DBG("Opening selected MIDI inputs:");
@@ -66,6 +69,7 @@ void MainComponent::initialize()
 
     disableFadeToggle.setButtonText("Disable Fade");
     disableFadeToggle.addListener(this);
+    addAndMakeVisible(disableFadeToggle);
 
     fadeRate = static_cast<float>(fadeRateSlider.getValue());
 
@@ -90,13 +94,13 @@ void MainComponent::initialize()
     instantUpdateToggle.setToggleState(false, juce::dontSendNotification);
     instantUpdateToggle.addListener(this);
 
-    enableMode1Button.setButtonText("Enable Mode 1");
-    enableMode1Button.addListener(this);
-    addAndMakeVisible(&enableMode1Button);
-
-    enableMode2Button.setButtonText("Enable Mode 2");
-    enableMode2Button.addListener(this);
-    addAndMakeVisible(&enableMode2Button);
+    // Add buttons to the component
+    addAndMakeVisible(scanButton);
+    addAndMakeVisible(applyButton);
+    addAndMakeVisible(fadeRateSlider);
+    addAndMakeVisible(disableFadeToggle);
+    addAndMakeVisible(noteColorSelector);
+    addAndMakeVisible(instantUpdateToggle);
 }
 
 //==============================================================================
@@ -109,8 +113,9 @@ MainComponent::~MainComponent()
     applyButton.removeListener(this);
     noteColorSelector.removeChangeListener(this);
     instantUpdateToggle.removeListener(this);
-    enableMode1Button.removeListener(this);
-    enableMode2Button.removeListener(this);
+
+    //enableMode1Button.removeListener(this);
+    //enableMode2Button.removeListener(this);
 
     for (auto* deviceToggle : midiDeviceToggles)
         deviceToggle->removeListener(this);
@@ -139,17 +144,17 @@ MainComponent::~MainComponent()
 //==============================================================================
 void MainComponent::paint(juce::Graphics& g)
 {
-    // Fill the background
+    // Fill the background with the look and feel's background color
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 
-    // Reduced paint call logging
     static int paintCallCount = 0;
     static juce::uint32 lastPaintTime = 0;
     juce::uint32 currentTime = juce::Time::getMillisecondCounter();
 
-    if (currentTime - lastPaintTime > 1000 || !midiMessages.empty())
+    // Log paint call details if debugMidiMessages is enabled
+    if (debugMidiMessages && (currentTime - lastPaintTime > 1000 || !midiMessages.empty()))
     {
-        DBG("Paint called (" + juce::String(++paintCallCount) + "). Number of MIDI messages: " + juce::String(midiMessages.size()));
+        DBG("Paint called (" + juce::String(++paintCallCount) + "). Number of MIDI messages: " + juce::String(midiMessages.size()) + ", Note events: " + juce::String(noteEventCount));
         lastPaintTime = currentTime;
     }
 
@@ -176,73 +181,124 @@ void MainComponent::paint(juce::Graphics& g)
             if (!disableFadeToggle.getToggleState())
             {
                 alpha *= (1.0f - fadeRate / 100.0f);
+                if (debugMidiMessages) {
+                    DBG("Fading alpha value; new alpha: " + juce::String(alpha));
+                }
             }
         }
     }
 
     // Remove messages with alpha less than 0.01
     std::erase_if(midiMessages, [](const auto& pair) { return pair.second < 0.01f; });
+    if (debugMidiMessages) {
+        DBG("Removed messages with alpha < 0.01; remaining count: " + juce::String(midiMessages.size()));
+    }
 }
 
 //==============================================================================
 void MainComponent::resized()
 {
     auto area = getLocalBounds().reduced(10);
-    enableMode1Button.setBounds(area.removeFromTop(30));
-    enableMode2Button.setBounds(area.removeFromTop(30));
+    //enableMode1Button.setBounds(area.removeFromTop(30));
+    //enableMode2Button.setBounds(area.removeFromTop(30));
     // Layout other components accordingly
 }
 
 //==============================================================================
-void MainComponent::noteColorChanged()
-{
+void MainComponent::noteColorChanged() {
     noteColor = noteColorSelector.getCurrentColour();
-    DBG("Note color changed to: " + noteColor.toString());
-
-    if (instantUpdateMode)
-    {
-        repaint();
+    if (instantUpdateToggle.getToggleState()) {
+        repaint(); // Apply changes immediately
     }
 }
 
 void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message)
 {
-    DBG("Incoming MIDI Message from: " + source->getName() + " Channel: " + juce::String(message.getChannel()));
+    int channel = message.getChannel();
 
-    updateMidiDeviceSelections();
+    // Log incoming MIDI message with source and channel information
+    if (debugMidiMessages) {
+        DBG("Incoming MIDI Message from: " + source->getName() + " Channel: " + juce::String(channel));
+    }
+
+    // Log detailed MIDI traffic information if enabled
+    if (debugMidiTraffic) {
+        juce::String logMessage = "MIDI Message: " + message.getDescription();
+        DBG(logMessage); // Log to console
+
+        // Optionally, write to a temporary text file
+        juce::File tempFile = juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile("midi_traffic_log.txt");
+        tempFile.appendText(logMessage + "\n");
+    }
+
+    // Only update MIDI device selections if necessary
+    static bool midiDeviceSelectionsUpdated = false;
+    if (!midiDeviceSelectionsUpdated) {
+        updateMidiDeviceSelections();
+        midiDeviceSelectionsUpdated = true;
+    }
 
     // Process the MIDI message if it's from a selected device and channel
     if (selectedMidiDevices.contains(source->getName()) &&
-        (selectedChannels.isEmpty() || selectedChannels.contains(message.getChannel())))
+        (selectedChannels.isEmpty() || selectedChannels.contains(channel)))
     {
-        DBG("Processing MIDI message");
+        // Log that the MIDI message is being processed
+        if (debugMidiProcessing) {
+            DBG("Processing MIDI message");
+        }
         processMidiMessage(message);
     }
     else
     {
-        DBG("MIDI message not from selected device/channel");
+        // Log that the MIDI message was received from an unselected source
+        if (debugMidiProcessing) {
+            DBG("MIDI message received from unselected source");
+        }
     }
 }
 
 //==============================================================================
-void MainComponent::processMidiMessage(const juce::MidiMessage& message)
-{
-    DBG("Processing MIDI message; Note ON: " + juce::String(message.getNoteNumber()) + ", Channel: " + juce::String(message.getChannel()));
-    if (message.isNoteOn())
-    {
-        midiMessages.emplace_back(message, 1.0f);
-        DBG("Added message to midiMessages; size: " + juce::String(midiMessages.size()));
+void MainComponent::processMidiMessage(const juce::MidiMessage& message) {
+    midiMessageCount++;
+    int channel = message.getChannel(); // Adjust channel number to be 1-based for logging
 
-        if (midiMessages.size() > 100)
-        {
+    // Log the processing of the MIDI message with note number and channel
+    if (debugMidiMessages) {
+        DBG("Processing MIDI message; Note ON: " + juce::String(message.getNoteNumber()) + ", Channel: " + juce::String(channel));
+    }
+
+    if (message.isNoteOn()) {
+        midiMessages.emplace_back(message, 1.0f);
+
+        // Increment note event count if enabled
+        if (enableNoteEventCount) {
+            noteEventCount++;
+            if (debugMidiMessages) {
+                DBG("Note event count incremented; new count: " + juce::String(noteEventCount));
+            }
+        }
+
+        // Log the addition of the message to the midiMessages vector
+        if (debugMidiMessages) {
+            DBG("Added message to midiMessages; count: " + juce::String(midiMessages.size()));
+        }
+
+        // Remove the oldest message if the vector size exceeds 100
+        if (midiMessages.size() > 100) {
             midiMessages.erase(midiMessages.begin());
-            DBG("Erased oldest message; new size: " + juce::String(midiMessages.size()));
+            if (debugMidiMessages) {
+                DBG("Erased oldest message; new count: " + juce::String(midiMessages.size()));
+            }
         }
     }
 
-    // Ensure repaint is called after processing a message
-    if (!isTimerRunning())
-        startTimerHz(60); // Repaint at 60 FPS
+    // Start the timer to repaint at 60 FPS if it's not already running
+    if (!isTimerRunning()) {
+        startTimerHz(60);
+        if (debugMidiMessages) {
+            DBG("Started timer for repainting at 60 FPS");
+        }
+    }
 }
 
 //==============================================================================
@@ -326,6 +382,8 @@ void MainComponent::refreshMidiInputs()
 //==============================================================================
 void MainComponent::applyMidiSelections()
 {
+    DBG("Apply button pushed. Applying MIDI selections.");
+
     // Close all currently open MIDI inputs
     for (auto* device : midiInputsOpened)
     {
@@ -335,6 +393,8 @@ void MainComponent::applyMidiSelections()
 
     // Now open the newly selected MIDI inputs
     openSelectedMidiInputs();
+
+    DBG("MIDI selections applied successfully.");
 }
 
 //==============================================================================
@@ -343,6 +403,8 @@ void MainComponent::sliderValueChanged(juce::Slider* slider)
     if (slider == &fadeRateSlider)
     {
         fadeRate = static_cast<float>(fadeRateSlider.getValue());
+        // Log the change in fade rate slider value
+        DBG("Slider: Fade rate changed to " + juce::String(fadeRate));
     }
 }
 
@@ -351,26 +413,29 @@ void MainComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
 {
     if (source == &noteColorSelector)
     {
-        noteColorChanged();
+        noteColor = noteColorSelector.getCurrentColour();
+        // Log the change in note color
+        DBG("ChangeListener: Note color changed to " + noteColor.toString());
     }
 }
 
 //==============================================================================
 void MainComponent::buttonClicked(juce::Button* button)
 {
+    // Log the button click event with the button's name
     DBG("Button clicked: " + button->getName());
 
-    // Check if the clicked button is one of our MIDI device or channel toggles
+    // Check if the clicked button is one of our MIDI devices or channel toggles
     bool isMidiToggle = false;
     for (auto* deviceToggle : midiDeviceToggles)
     {
         if (button == deviceToggle)
         {
-            DBG("MIDI device toggle clicked: " + deviceToggle->getName());
             isMidiToggle = true;
             break;
         }
     }
+
     if (!isMidiToggle)
     {
         for (auto* channelToggles : midiChannelToggles)
@@ -379,57 +444,45 @@ void MainComponent::buttonClicked(juce::Button* button)
             {
                 if (button == channelToggle)
                 {
-                    DBG("MIDI channel toggle clicked: " + channelToggle->getName());
                     isMidiToggle = true;
                     break;
                 }
             }
-            if (isMidiToggle) break;
+            if (isMidiToggle)
+                break;
         }
     }
 
     if (isMidiToggle)
     {
+        // Log the update of MIDI device selections
         DBG("Updating MIDI device selections");
         updateMidiDeviceSelections();
     }
     else if (button == &disableFadeToggle)
     {
-        DBG("Fade toggle button clicked");
+        // Log the state change of the disable fade toggle button
+        DBG("Disable Fade toggled to " + juce::String(disableFadeToggle.getToggleState() ? "ON" : "OFF"));
         fadeToggleChanged();
     }
     else if (button == &scanButton)
     {
+        // Log the click event of the scan button
         DBG("Scan button clicked");
         refreshMidiInputs();
     }
     else if (button == &applyButton)
     {
+        // Log the click event of the apply button
         DBG("Apply button clicked");
-        updateMidiDeviceSelections();
         applyMidiSelections();
     }
     else if (button == &instantUpdateToggle)
     {
-        DBG("Instant update toggle button clicked");
         instantUpdateMode = instantUpdateToggle.getToggleState();
-        if (instantUpdateMode)
-        {
-            repaint();
-        }
+        // Log the state change of the instant update toggle button
+        DBG("Instant update mode: " + juce::String(instantUpdateMode ? "true" : "false"));
     }
-    else if (button == &enableMode1Button)
-    {
-        DBG("Enable Mode 1 button clicked");
-        // Add logic to handle enabling Mode 1
-    }
-    else if (button == &enableMode2Button)
-    {
-        DBG("Enable Mode 2 button clicked");
-        // Add logic to handle enabling Mode 2
-    }
-
-    DBG("Button click handling completed");
 }
 
 //==============================================================================
@@ -522,14 +575,6 @@ void MainComponent::refreshSettingsWindow()
         DBG("Adding Instant Update toggle");
         instantUpdateToggle.setBounds(10, yPos, 380, 30);
         content->addAndMakeVisible(instantUpdateToggle);
-        yPos += 35;
-
-        // Mode Buttons
-        DBG("Adding Mode buttons");
-        enableMode1Button.setBounds(10, yPos, 185, 30);
-        content->addAndMakeVisible(enableMode1Button);
-        enableMode2Button.setBounds(205, yPos, 185, 30);
-        content->addAndMakeVisible(enableMode2Button);
         yPos += 35;
 
         DBG("Resizing content");
@@ -632,13 +677,6 @@ void MainComponent::showSettingsWindow()
         settingsContent->addAndMakeVisible(instantUpdateToggle);
         yPos += 35;
 
-        // Mode buttons (Enable Mode 1 and Enable Mode 2)
-        enableMode1Button.setBounds(10, yPos, 185, 30);
-        settingsContent->addAndMakeVisible(enableMode1Button);
-        enableMode2Button.setBounds(205, yPos, 185, 30);
-        settingsContent->addAndMakeVisible(enableMode2Button);
-        yPos += 35;
-
         // Set the size of the content
         settingsContent->setSize(400, yPos);
 
@@ -721,6 +759,11 @@ void MainComponent::fadeToggleChanged()
     {
         fadeRate = static_cast<float>(fadeRateSlider.getValue());
     }
+
+    if (instantUpdateToggle.getToggleState())
+    {
+        repaint(); // Apply changes immediately if instantUpdateMode is enabled
+    }
 }
 
 //==============================================================================
@@ -730,8 +773,8 @@ void MainComponent::openSelectedMidiInputs()
     for (const auto& deviceName : selectedMidiDevices)
     {
         // Check if the device is already opened
-        bool isAlreadyOpened = std::any_of(midiInputsOpened.begin(), midiInputsOpened.end(),
-                                           [&](juce::MidiInput* input) { return input->getName() == deviceName; });
+        bool isAlreadyOpened = std::ranges::any_of(midiInputsOpened,
+                                                   [&](juce::MidiInput* input) { return input->getName() == deviceName; });
         if (isAlreadyOpened)
             continue;
 

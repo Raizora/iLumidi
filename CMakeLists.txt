@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# Set the build type to Debug
+set(CMAKE_BUILD_TYPE Debug)
+
 # JUCE Directory (Development Branch)
 if(NOT DEFINED JUCE_DIR)
     set(JUCE_DIR "/Users/jamiebenchia/JUCE")  # Update this path to your JUCE development branch
