@@ -2,6 +2,9 @@
 
 #include <JuceHeader.h>
 #include "CustomLookAndFeel.h"
+#include <fstream>
+#include <juce_audio_basics/juce_audio_basics.h>
+
 
 //==============================================================================
 class MainComponent : public juce::Component,
@@ -32,6 +35,9 @@ private:
     class SettingsWindowCloseButtonHandler;
 
     std::unique_ptr<juce::DocumentWindow> settingsWindow;
+    juce::MidiMessageCollector midiCollector;
+    juce::MidiKeyboardState keyboardState;
+    std::ofstream midiLogFile; // Add this member variable
 
     // Methods for MIDI device selection
     void refreshMidiInputs();
@@ -41,7 +47,7 @@ private:
     void updateMidiDeviceSelections();
     void processMidiMessage(const juce::MidiMessage& message);
     void timerCallback() override;
-
+    void logMidiTraffic(const juce::String& message);
     // **Added missing method declarations**
     void noteColorChanged();
     void fadeToggleChanged();
@@ -57,7 +63,6 @@ private:
     juce::OwnedArray<juce::ToggleButton> midiDeviceToggles;
     juce::OwnedArray<juce::OwnedArray<juce::ToggleButton>> midiChannelToggles;
     juce::TextButton applyButton;
-
     juce::ToggleButton instantUpdateToggle;
 
     // New buttons for mode switching

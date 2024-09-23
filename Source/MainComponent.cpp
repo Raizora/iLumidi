@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <vector>
 #include <ranges>
+#include <fstream>
+#include <juce_audio_basics/juce_audio_basics.h>
+
 
 //==============================================================================
 class MainComponent::SettingsWindowCloseButtonHandler : public juce::DocumentWindow
@@ -43,6 +46,13 @@ MainComponent::MainComponent()
 
     disableFadeToggle.setButtonText("Disable Fade");
     disableFadeToggle.addListener(this);
+
+    // Open the log file
+    midiLogFile.open("/Users/jamiebenchia/JUCE Projects/iLumidi/Midi Logs/midi_traffic_log.txt", std::ios::out | std::ios::app);
+    if (!midiLogFile.is_open())
+    {
+        DBG("Failed to open MIDI log file");
+    }
 }
 
 void MainComponent::initialize()
@@ -139,6 +149,12 @@ MainComponent::~MainComponent()
         settingsWindow->setVisible(false);
         settingsWindow.reset();
     }
+
+    // Close the log file
+    if (midiLogFile.is_open())
+    {
+        midiLogFile.close();
+    }
 }
 
 //==============================================================================
@@ -216,19 +232,21 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
 {
     int channel = message.getChannel();
 
+    // Log all incoming MIDI messages with detailed information
+    if (debugMidiTraffic) {
+        juce::String logMessage = "MIDI Message from: " + source->getName() + " - " + message.getDescription();
+        logMessage += "\nChannel: " + juce::String(channel);
+        logMessage += "\nNote Number: " + juce::String(message.getNoteNumber());
+        logMessage += "\nVelocity: " + juce::String(message.getVelocity());
+        logMessage += "\nController Number: " + juce::String(message.getControllerNumber());
+        logMessage += "\nController Value: " + juce::String(message.getControllerValue());
+        DBG(logMessage); // Log to console
+        logMidiTraffic(logMessage); // Log to file
+    }
+
     // Log incoming MIDI message with source and channel information
     if (debugMidiMessages) {
         DBG("Incoming MIDI Message from: " + source->getName() + " Channel: " + juce::String(channel));
-    }
-
-    // Log detailed MIDI traffic information if enabled
-    if (debugMidiTraffic) {
-        juce::String logMessage = "MIDI Message: " + message.getDescription();
-        DBG(logMessage); // Log to console
-
-        // Optionally, write to a temporary text file
-        juce::File tempFile = juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile("midi_traffic_log.txt");
-        tempFile.appendText(logMessage + "\n");
     }
 
     // Only update MIDI device selections if necessary
@@ -255,8 +273,10 @@ void MainComponent::handleIncomingMidiMessage(juce::MidiInput* source, const juc
             DBG("MIDI message received from unselected source");
         }
     }
-}
 
+    // Use the MidiMessageCollector to handle the message
+    midiCollector.addMessageToQueue(message);
+}
 //==============================================================================
 void MainComponent::processMidiMessage(const juce::MidiMessage& message) {
     midiMessageCount++;
@@ -309,6 +329,14 @@ void MainComponent::timerCallback()
     // Stop the timer if there are no MIDI messages to process
     if (midiMessages.empty())
         stopTimer();
+}
+
+void MainComponent::logMidiTraffic(const juce::String& message)
+{
+    if (midiLogFile.is_open())
+    {
+        midiLogFile << message << std::endl;
+    }
 }
 
 //==============================================================================
@@ -787,11 +815,15 @@ void MainComponent::openSelectedMidiInputs()
             {
                 midiInputsOpened.add(midiInput.release());
                 midiInputsOpened.getLast()->start();
-                DBG("Opened and started MIDI device: " + deviceName);
+                juce::String logMessage = "Opened and started MIDI device: " + deviceName;
+                DBG(logMessage);
+                logMidiTraffic(logMessage);
             }
             else
             {
-                DBG("Failed to open MIDI device: " + deviceName);
+                juce::String logMessage = "Failed to open MIDI device: " + deviceName;
+                DBG(logMessage);
+                logMidiTraffic(logMessage);
             }
         }
     }
